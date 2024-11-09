@@ -63,3 +63,26 @@ model Token {
 // enum TokenType {
 //   RESET_PASSWORD
 // }
+
+model Category {
+  id        Int       @id @default(autoincrement()) // Unique identifier for each category
+  createdAt DateTime  @default(now()) // Timestamp when the category was created
+  updatedAt DateTime  @updatedAt // Timestamp when the category was last updated
+  name      String    @unique // Unique name for the category
+  products  Product[] // Relation to the Product model (one-to-many)
+}
+
+model Product {
+  id                 Int      @id @default(autoincrement())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  productName        String
+  productDescription String?
+  productImage       String?
+  quantity           Int
+  categoryId         Int // Foreign key to the Category model
+  srp                Float // Ensures it's a float, but validation must be done elsewhere to ensure it's positive
+  sdp                Float
+
+  category Category @relation(fields: [categoryId], references: [id]) // Foreign key relation
+}
