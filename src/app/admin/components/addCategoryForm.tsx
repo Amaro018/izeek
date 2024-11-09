@@ -1,7 +1,7 @@
 // pages/admin/createCategory.tsx (or another page/component)
 
 import { useMutation } from "@blitzjs/rpc"
-import createCategory from "app/categories/mutations/createCategory"
+import createCategory from "../mutations/createCategory"
 import { useState } from "react"
 
 export default function CreateCategoryForm() {

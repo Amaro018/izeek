@@ -1,7 +1,9 @@
 "use client"
 import Sidebar from "../components/Sidebar"
-
+import Modal from "@mui/material/Modal"
 import * as React from "react"
+import Box from "@mui/material/Box"
+import addCategoryForm from "../components/addCategoryForm"
 
 const style = {
   position: "absolute",
@@ -33,6 +35,21 @@ const CategoryPage = () => {
           + Add Category
         </button>
       </div>
+
+      {/* MODAL HERE */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div className="p-2">
+            <addCategoryForm />
+          </div>
+        </Box>
+      </Modal>
+
       <div>
         <table className="w-full border-collapse">
           <thead>
@@ -43,19 +60,7 @@ const CategoryPage = () => {
               <th className="p-2 border-b-2">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr className="bg-white border-b-2">
-              <td className="p-2">Shoes</td>
-              <td className="p-2">
-                <button className="bg-yellow-400 px-4 py-2 text-2xl text-white rounded-md mr-2">
-                  Edit
-                </button>
-                <button className="bg-red-400 px-4 py-2 text-2xl text-white rounded-md">
-                  Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
     </div>
