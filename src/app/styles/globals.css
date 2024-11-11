@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.swal-high-index {
+  z-index: 999999999999999999999999999999999999999999999999999999999999999999;
+}

@@ -1,5 +1,3 @@
-// app/categories/mutations/createCategory.ts
-
 import { Ctx } from "blitz"
 import db from "db" // The Prisma client instance
 import { z } from "zod"
@@ -21,12 +19,14 @@ export default async function createCategory(input: { name: string }, ctx: Ctx) 
     throw new Error("You must be logged in to create a category.")
   }
 
+  // Lowercase the category name
+  const lowercaseName = name.toLowerCase()
+
   // Create the category in the database
   const category = await db.category.create({
     data: {
-      name,
+      name: lowercaseName,
     },
   })
-
   return category
 }

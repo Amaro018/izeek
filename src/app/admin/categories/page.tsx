@@ -1,9 +1,14 @@
 "use client"
-import Sidebar from "../components/Sidebar"
 import Modal from "@mui/material/Modal"
 import * as React from "react"
 import Box from "@mui/material/Box"
-import addCategoryForm from "../components/addCategoryForm"
+import CategoryForm from "../components/CategoryForm"
+import { useState } from "react"
+import { useQuery, useMutation } from "@blitzjs/rpc"
+import getCategories from "../queries/getCategories" // Ensure this is the correct path
+import CategoryList from "../components/CategoryList"
+import createCategory from "../mutations/createCategory"
+import updateCategory from "../../mutations/updateCategory" // Import update mutation
 
 const style = {
   position: "absolute",
@@ -19,10 +24,39 @@ const style = {
 }
 
 const CategoryPage = () => {
-  const [open, setOpen] = React.useState(false)
-  const handleOpen = () => setOpen(true)
+  const [open, setOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false) // Track whether form is in edit mode
+  const [selectedCategory, setSelectedCategory] = useState(null) // Track the selected category for editing
+
+  const [createCategoryMutation] = useMutation(createCategory)
+  const [updateCategoryMutation] = useMutation(updateCategory)
+
+  const handleOpenAdd = () => {
+    setIsEditMode(false) // Open in add mode
+    setSelectedCategory(null)
+    setOpen(true)
+  }
+
+  const handleOpenEdit = (category) => {
+    setIsEditMode(true) // Open in edit mode
+    setSelectedCategory(category)
+    setOpen(true)
+  }
+
   const handleClose = () => setOpen(false)
-  // Only authenticated users can access this page
+
+  const handleSubmit = async (categoryData) => {
+    try {
+      if (isEditMode) {
+        await updateCategoryMutation({ id: selectedCategory.id, ...categoryData })
+      } else {
+        await createCategoryMutation(categoryData)
+      }
+      handleClose()
+    } catch (err) {
+      console.error("An error occurred:", err)
+    }
+  }
 
   return (
     <div className="w-full flex flex-col">
@@ -30,13 +64,11 @@ const CategoryPage = () => {
         <h1 className="text-4xl font-bold">Categories</h1>
         <button
           className="bg-green-400 px-4 py-2 text-2xl text-white rounded-md"
-          onClick={handleOpen}
+          onClick={handleOpenAdd}
         >
           + Add Category
         </button>
       </div>
-
-      {/* MODAL HERE */}
       <Modal
         open={open}
         onClose={handleClose}
@@ -45,24 +77,15 @@ const CategoryPage = () => {
       >
         <Box sx={style}>
           <div className="p-2">
-            <addCategoryForm />
+            <CategoryForm
+              initialValues={isEditMode ? selectedCategory : {}}
+              onSubmit={handleSubmit}
+              formTitle={isEditMode ? "Edit Category" : "Add Category"}
+            />
           </div>
         </Box>
       </Modal>
-
-      <div>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2 border-r-2 border-b-2">Name</th>
-              <th className="p-2 border-r-2 border-b-2">Created At</th>
-              <th className="p-2 border-r-2 border-b-2">Updated At</th>
-              <th className="p-2 border-b-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+      <CategoryList onEdit={handleOpenEdit} /> {/* Pass edit handler */}
     </div>
   )
 }

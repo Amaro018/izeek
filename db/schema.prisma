@@ -78,7 +78,7 @@ model Product {
   updatedAt          DateTime @updatedAt
   productName        String
   productDescription String?
-  productImage       String?
+  productImage       String?  @db.LongText
   quantity           Int
   categoryId         Int // Foreign key to the Category model
   srp                Float // Ensures it's a float, but validation must be done elsewhere to ensure it's positive
