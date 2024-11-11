@@ -1,3 +1,6 @@
+"use client"
+
+import React, { useEffect } from "react"
 import Link from "next/link"
 import { useQuery, useMutation } from "@blitzjs/rpc"
 import getCategories from "./../queries/getCategories"
@@ -20,15 +23,10 @@ const style = {
   borderRadius: "10px",
 }
 
-export default function CategoryList() {
-  const [categories, { isLoading, isError, refetch }] = useQuery(getCategories, {})
+export default function CategoryList({ isEditMode, handleModal, categories, setCategory, inputName, onSubmit }: { isEditMode: { isEditMode: boolean, setIsEditMode: any }, handleModal?: { open: boolean, setOpen: any} , categories?: { categories: any, isLoading: any, isError: any, refetch: any },setCategory?: any, inputName?: { name: string, setName: any }, onSubmit?: any }) {
   const [deleteCategoryMutation] = useMutation(deleteCategory)
 
-  const [open, setOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState(null)
-
-  if (isLoading) return <p>Loading...</p>
-  if (isError) return <p>Error loading categories.</p>
 
   // Function to handle deletion with confirmation
   const handleDelete = async (id) => {
@@ -44,18 +42,19 @@ export default function CategoryList() {
 
     if (result.isConfirmed) {
       await deleteCategoryMutation({ id })
-      refetch()
       Swal.fire("Deleted!", "The category has been deleted.", "success")
     }
   }
 
-  const handleUpdate = (category) => {
+  const handleUpdate = (category: any) => {
     setSelectedCategory(category)
-    setOpen(true)
+    handleModal?.setOpen(true)
+    inputName?.setName(category.name)
+    isEditMode?.setIsEditMode(true)
   }
 
   const handleClose = () => {
-    setOpen(false)
+    handleModal?.setOpen(false)
     setSelectedCategory(null)
   }
 
@@ -71,7 +70,7 @@ export default function CategoryList() {
           </tr>
         </thead>
         <tbody>
-          {categories.map((category) => (
+          {categories?.categories.map((category: any) => (
             <tr key={category.id}>
               <td className="p-2 border-b-2 text-center font-bold">
                 {category.name.toUpperCase()}
@@ -109,9 +108,9 @@ export default function CategoryList() {
         </tbody>
       </table>
 
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={handleModal?.open ?? false} onClose={handleClose}>
         <Box sx={style}>
-          <CategoryForm category={selectedCategory} />
+          <CategoryForm isEditMode={isEditMode?.isEditMode} category={selectedCategory} setCategory={setCategory} inputName={inputName} onSubmit={onSubmit} />
         </Box>
       </Modal>
     </div>

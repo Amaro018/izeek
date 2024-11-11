@@ -9,6 +9,7 @@ import getCategories from "../queries/getCategories" // Ensure this is the corre
 import CategoryList from "../components/CategoryList"
 import createCategory from "../mutations/createCategory"
 import updateCategory from "../../mutations/updateCategory" // Import update mutation
+import Swal from "sweetalert2"
 
 const style = {
   position: "absolute",
@@ -31,31 +32,54 @@ const CategoryPage = () => {
   const [createCategoryMutation] = useMutation(createCategory)
   const [updateCategoryMutation] = useMutation(updateCategory)
 
+  const [category, setCategory] = useState<any>(null)
+  const [name, setName] = useState<string>("")
+
+  const [categories, { isLoading, isError, refetch }] = useQuery(getCategories, {})
+
   const handleOpenAdd = () => {
     setIsEditMode(false) // Open in add mode
     setSelectedCategory(null)
     setOpen(true)
   }
 
-  const handleOpenEdit = (category) => {
-    setIsEditMode(true) // Open in edit mode
-    setSelectedCategory(category)
-    setOpen(true)
+  const handleClose = () => {
+    setOpen(false)
   }
 
-  const handleClose = () => setOpen(false)
-
-  const handleSubmit = async (categoryData) => {
-    try {
-      if (isEditMode) {
-        await updateCategoryMutation({ id: selectedCategory.id, ...categoryData })
-      } else {
-        await createCategoryMutation(categoryData)
+  const handleSubmit = async (e: any) => {
+    e.preventDefault()
+    console.log(category ? "may category" : "walang cateory")
+    if (category) {
+      const res = await updateCategoryMutation({ id: category.id, name })
+      if (res) {
+        setOpen(false)
+        Swal.fire({
+          title: "Updated!",
+          text: "The category has been Updated.",
+          icon: "success",
+          customClass: {
+            popup: "swal-high-index",
+          },
+        })
       }
-      handleClose()
-    } catch (err) {
-      console.error("An error occurred:", err)
+      // else swal err
+    } else {
+      const res = await createCategoryMutation({ name })
+      if (res) {
+        setOpen(false)
+        Swal.fire({
+          title: "Created!",
+          text: "The category has been created.",
+          icon: "success",
+          customClass: {
+            popup: "swal-high-index",
+          },
+        })
+      }
+      // else swal err
     }
+    refetch()
   }
 
   return (
@@ -80,12 +104,14 @@ const CategoryPage = () => {
             <CategoryForm
               initialValues={isEditMode ? selectedCategory : {}}
               onSubmit={handleSubmit}
-              formTitle={isEditMode ? "Edit Category" : "Add Category"}
+              isEditMode={isEditMode}
+              setCategory={setCategory}
+              inputName={{ name, setName }}
             />
           </div>
         </Box>
       </Modal>
-      <CategoryList onEdit={handleOpenEdit} /> {/* Pass edit handler */}
+      <CategoryList isEditMode={{ isEditMode, setIsEditMode }} handleModal={{ open, setOpen }} categories={{ categories, isLoading, isError, refetch }} setCategory={setCategory} inputName={{ name, setName }} onSubmit={handleSubmit} />
     </div>
   )
 }
