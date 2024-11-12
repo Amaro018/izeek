@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { LogoutButton } from "../../(auth)/components/LogoutButton"
 
 export default function Sidebar() {
   return (
@@ -13,6 +14,9 @@ export default function Sidebar() {
       <Link href="/admin/profile">
         <h1 className="text-lg font-bold">Profile</h1>
       </Link>
+      <div className="flex flex-row gap-4 text-lg font-bold ">
+        <LogoutButton />
+      </div>
     </div>
   )
 }

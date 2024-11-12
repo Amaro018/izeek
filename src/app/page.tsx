@@ -8,7 +8,7 @@ export default async function Home() {
   const currentUser = await invoke(getCurrentUser, null)
   return (
     <>
-      <Nav />
+      <Nav currentUser={currentUser} />
     </>
   )
 }

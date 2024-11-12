@@ -23,7 +23,21 @@ const style = {
   borderRadius: "10px",
 }
 
-export default function CategoryList({ isEditMode, handleModal, categories, setCategory, inputName, onSubmit }: { isEditMode: { isEditMode: boolean, setIsEditMode: any }, handleModal?: { open: boolean, setOpen: any} , categories?: { categories: any, isLoading: any, isError: any, refetch: any },setCategory?: any, inputName?: { name: string, setName: any }, onSubmit?: any }) {
+export default function CategoryList({
+  isEditMode,
+  handleModal,
+  categories,
+  setCategory,
+  inputName,
+  onSubmit,
+}: {
+  isEditMode: { isEditMode: boolean; setIsEditMode: any }
+  handleModal?: { open: boolean; setOpen: any }
+  categories?: { categories: any; isLoading: any; isError: any; refetch: any }
+  setCategory?: any
+  inputName?: { name: string; setName: any }
+  onSubmit?: any
+}) {
   const [deleteCategoryMutation] = useMutation(deleteCategory)
 
   const [selectedCategory, setSelectedCategory] = useState(null)
@@ -44,6 +58,7 @@ export default function CategoryList({ isEditMode, handleModal, categories, setC
       await deleteCategoryMutation({ id })
       Swal.fire("Deleted!", "The category has been deleted.", "success")
     }
+    await categories?.refetch()
   }
 
   const handleUpdate = (category: any) => {
@@ -110,7 +125,13 @@ export default function CategoryList({ isEditMode, handleModal, categories, setC
 
       <Modal open={handleModal?.open ?? false} onClose={handleClose}>
         <Box sx={style}>
-          <CategoryForm isEditMode={isEditMode?.isEditMode} category={selectedCategory} setCategory={setCategory} inputName={inputName} onSubmit={onSubmit} />
+          <CategoryForm
+            isEditMode={isEditMode?.isEditMode}
+            category={selectedCategory}
+            setCategory={setCategory}
+            inputName={inputName}
+            onSubmit={onSubmit}
+          />
         </Box>
       </Modal>
     </div>

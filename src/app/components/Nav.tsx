@@ -1,16 +1,23 @@
 import Link from "next/link"
-import { invoke } from "./../blitz-server"
+import { useQuery } from "@blitzjs/rpc"
 import { LogoutButton } from "./../(auth)/components/LogoutButton"
-// import styles from "./styles/Home.module.css"
-import getCurrentUser from "./../users/queries/getCurrentUser"
+import { Box } from "@mui/material"
 
-export default async function Nav() {
-  const currentUser = await invoke(getCurrentUser, null)
+export default function Nav(props) {
+  const currentUser = props.currentUser
 
   return (
     <nav className="flex flex-row justify-between py-8 px-16 bg-orange-200 items-center">
       <div className="flex flex-row items-center gap-4">
-        <img src="/izeek.png" alt="logo" className="w-12 h-12" />
+        <Box
+          component="img"
+          sx={{
+            height: 50,
+            width: 50,
+          }}
+          alt="iZeek Logo"
+          src="/izeek.png"
+        />
         <h1 className="text-4xl font-bold">i-Zeek</h1>
       </div>
       <ul className="flex flex-row gap-4">
@@ -22,19 +29,7 @@ export default async function Nav() {
         </li>
         <li className="hover:underline">Products</li>
 
-        <div>
-          {currentUser ? (
-            <>
-              <LogoutButton />
-            </>
-          ) : (
-            <>
-              <Link href="/login">
-                <strong>Login</strong>
-              </Link>
-            </>
-          )}
-        </div>
+        <div></div>
       </ul>
     </nav>
   )

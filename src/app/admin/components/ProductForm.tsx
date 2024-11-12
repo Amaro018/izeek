@@ -82,13 +82,31 @@ const ProductForm: FC<ProductFormProps> = ({ product }) => {
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
       <p className="text-lg font-bold mb-4 text-center">Adding New Product</p>
 
-      <TextField
-        label="Product Name"
-        variant="outlined"
-        value={productName}
-        onChange={(e) => setProductName(e.target.value)}
-        required
-      />
+      <div className="w-full flex flex-row gap-4">
+        <TextField
+          label="Product Name"
+          variant="outlined"
+          value={productName}
+          onChange={(e) => setProductName(e.target.value)}
+          required
+          fullWidth
+        />
+
+        <TextField
+          select
+          label="Select Category"
+          value={categoryId}
+          onChange={(e) => setCategoryId(Number(e.target.value))}
+          helperText="Please select a category"
+          fullWidth
+        >
+          {categories.map((category) => (
+            <MenuItem key={category.id} value={category.id}>
+              {category.name}
+            </MenuItem>
+          ))}
+        </TextField>
+      </div>
 
       <TextField
         label="Description"
@@ -98,45 +116,34 @@ const ProductForm: FC<ProductFormProps> = ({ product }) => {
         maxRows={4}
         required
       />
+      <div className="w-full flex flex-row gap-4 mt-4">
+        <TextField
+          label="Quantity"
+          variant="outlined"
+          value={quantity}
+          type="number"
+          onChange={(e) => setQuantity(Number(e.target.value) || "")}
+          fullWidth
+        />
 
-      <TextField
-        label="Quantity"
-        variant="outlined"
-        value={quantity}
-        type="number"
-        onChange={(e) => setQuantity(Number(e.target.value) || "")}
-      />
+        <TextField
+          label="Srp"
+          variant="outlined"
+          value={srp}
+          type="number"
+          onChange={(e) => setSrp(parseFloat(e.target.value) || "")}
+          fullWidth
+        />
 
-      <TextField
-        label="Srp"
-        variant="outlined"
-        value={srp}
-        type="number"
-        onChange={(e) => setSrp(parseFloat(e.target.value) || "")}
-      />
-
-      <TextField
-        label="Sdp"
-        variant="outlined"
-        value={sdp}
-        type="number"
-        onChange={(e) => setSdp(parseFloat(e.target.value) || "")}
-      />
-
-      <TextField
-        select
-        label="Select Category"
-        value={categoryId}
-        onChange={(e) => setCategoryId(Number(e.target.value))}
-        helperText="Please select a category"
-      >
-        {categories.map((category) => (
-          <MenuItem key={category.id} value={category.id}>
-            {category.name}
-          </MenuItem>
-        ))}
-      </TextField>
-
+        <TextField
+          label="Sdp"
+          variant="outlined"
+          value={sdp}
+          type="number"
+          onChange={(e) => setSdp(parseFloat(e.target.value) || "")}
+          fullWidth
+        />
+      </div>
       <label htmlFor="productImage">Product Image</label>
       <input
         id="productImage"

@@ -29,7 +29,7 @@ export default function ProductPage() {
   }
   return (
     <div className="w-full flex flex-col">
-      <div className="bg-orange-200 p-4 rounded-t-lg flex flex-row items-center justify-between">
+      <div className="bg-orange-200 p-4 rounded-t-lg flex flex-row items-center justify-between w-full">
         <h1 className="text-4xl font-bold text-white">Products</h1>
         <button
           className="bg-green-500 px-4 py-2 text-2xl text-white font-bold rounded-md hover:bg-green-600 transition-colors duration-300"

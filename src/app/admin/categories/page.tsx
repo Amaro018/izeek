@@ -63,6 +63,7 @@ const CategoryPage = () => {
           },
         })
       }
+      refetch()
       // else swal err
     } else {
       const res = await createCategoryMutation({ name })
@@ -80,6 +81,7 @@ const CategoryPage = () => {
       // else swal err
     }
     refetch()
+    window.location.reload()
   }
 
   return (
@@ -111,7 +113,14 @@ const CategoryPage = () => {
           </div>
         </Box>
       </Modal>
-      <CategoryList isEditMode={{ isEditMode, setIsEditMode }} handleModal={{ open, setOpen }} categories={{ categories, isLoading, isError, refetch }} setCategory={setCategory} inputName={{ name, setName }} onSubmit={handleSubmit} />
+      <CategoryList
+        isEditMode={{ isEditMode, setIsEditMode }}
+        handleModal={{ open, setOpen }}
+        categories={{ categories, isLoading, isError, refetch }}
+        setCategory={setCategory}
+        inputName={{ name, setName }}
+        onSubmit={handleSubmit}
+      />
     </div>
   )
 }
