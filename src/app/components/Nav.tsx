@@ -3,7 +3,7 @@ import { useQuery } from "@blitzjs/rpc"
 import { LogoutButton } from "./../(auth)/components/LogoutButton"
 import { Box } from "@mui/material"
 
-export default function Nav(props) {
+export default function Nav(props: any) {
   const currentUser = props.currentUser
 
   return (
@@ -24,10 +24,10 @@ export default function Nav(props) {
         <li className="hover:underline">
           <Link href="/">Home</Link>
         </li>
-        <li className="hover:underline">
-          <Link href="/about">About</Link>
-        </li>
         <li className="hover:underline">Products</li>
+        <li className="hover:underline">
+          <Link href="/about">Contact</Link>
+        </li>
 
         <div></div>
       </ul>
