@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import getCurrentUser from "./users/queries/getCurrentUser"
 import { invoke } from "./blitz-server"
 import Nav from "./components/Nav"
+import Footer from "./components/Footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -21,7 +22,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <>
             <main>
               <Nav currentUser={currentUser} />
+
               {children}
+
+              <Footer />
             </main>
           </>
         </BlitzProvider>

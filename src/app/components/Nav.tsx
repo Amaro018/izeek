@@ -24,12 +24,25 @@ export default function Nav(props: any) {
         <li className="hover:underline">
           <Link href="/">Home</Link>
         </li>
-        <li className="hover:underline">Products</li>
         <li className="hover:underline">
-          <Link href="/about">Contact</Link>
+          <Link href={"/products"}>Products</Link>
+        </li>
+        <li className="hover:underline">
+          <Link href="/contact">Contact</Link>
         </li>
 
-        <div></div>
+        <li>
+          {currentUser ? (
+            <div className="flex flex-row gap-4  font-bold">
+              <Link href="/admin/dashboard">Dashboard</Link>
+              <LogoutButton />
+            </div>
+          ) : (
+            <div className="flex flex-row gap-4  font-bold">
+              <Link href="/login">Login</Link>
+            </div>
+          )}
+        </li>
       </ul>
     </nav>
   )

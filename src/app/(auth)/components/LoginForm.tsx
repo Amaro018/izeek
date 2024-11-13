@@ -20,49 +20,61 @@ export const LoginForm = (props: LoginFormProps) => {
   const next = useSearchParams()?.get("next")
   return (
     <>
-      <h1>Login</h1>
-      <div className=" flex justify-center p-4">
-        <Form
-          submitText="Login"
-          schema={Login}
-          initialValues={{ email: "", password: "" }}
-          onSubmit={async (values) => {
-            try {
-              await loginMutation(values)
-              router.refresh()
-              if (next) {
-                router.push(next as Route)
-              } else {
-                router.push("/admin/dashboard")
-                console.log("redirecting to dashboard")
-              }
-            } catch (error: any) {
-              if (error instanceof AuthenticationError) {
-                return { [FORM_ERROR]: "Sorry, those credentials are invalid" }
-              } else {
-                return {
-                  [FORM_ERROR]:
-                    "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
+      <div className="flex justify-center p-16">
+        <div className="flex flex-col justify-center w-1/4 border border-orange-400 rounded-lg p-8">
+          <h1 className="text-4xl font-bold text-center">ADMIN LOGIN</h1>
+          <div className="py-8">
+            <Form
+              schema={Login}
+              initialValues={{ email: "", password: "" }}
+              onSubmit={async (values) => {
+                try {
+                  await loginMutation(values)
+                  router.refresh()
+                  if (next) {
+                    router.push(next as Route)
+                  } else {
+                    router.push("/admin/dashboard")
+                    router.refresh()
+                    console.log("redirecting to dashboard")
+                  }
+                } catch (error: any) {
+                  if (error instanceof AuthenticationError) {
+                    return { [FORM_ERROR]: "Sorry, those credentials are invalid" }
+                  } else {
+                    return {
+                      [FORM_ERROR]:
+                        "Sorry, we had an unexpected error. Please try again. - " +
+                        error.toString(),
+                    }
+                  }
                 }
-              }
-            }
-          }}
-        >
-          <LabeledTextField name="email" label="Email" placeholder="Email" />
-          <LabeledTextField
-            name="password"
-            label="Password"
-            placeholder="Password"
-            type="password"
-          />
-          <div>
-            <Link href={"/forgot-password"}>Forgot your password?</Link>
+              }}
+            >
+              <LabeledTextField name="email" label="Email" placeholder="Email" className="w-full" />
+              <LabeledTextField
+                name="password"
+                label="Password"
+                placeholder="Password"
+                type="password"
+                className="w-full"
+              />
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-full rounded"
+                type="submit"
+              >
+                Login
+              </button>
+              <div>
+                <Link href={"/forgot-password"}>Forgot your password?</Link>
+              </div>
+            </Form>
           </div>
-        </Form>
-      </div>
 
-      <div style={{ marginTop: "1rem" }}>
+          {/* <div style={{ marginTop: "1rem" }}>
         Or <Link href="/signup">Sign Up</Link>
+        </div> */}
+        </div>
       </div>
     </>
   )

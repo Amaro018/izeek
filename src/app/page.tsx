@@ -1,23 +1,19 @@
+"use client"
 import Link from "next/link"
-import { invoke } from "./blitz-server"
-import { LogoutButton } from "./(auth)/components/LogoutButton"
-import styles from "./styles/Home.module.css"
-import getCurrentUser from "./users/queries/getCurrentUser"
-import Nav from "./components/Nav"
+import { useQuery } from "@blitzjs/rpc"
 import getProducts from "./queries/getProducts"
 import FacebookIcon from "@mui/icons-material/Facebook"
 import HomeIcon from "@mui/icons-material/Home"
 import EmailIcon from "@mui/icons-material/Email"
 import PhoneIcon from "@mui/icons-material/Phone"
 
-export default async function Home() {
-  // const currentUser = await invoke(getCurrentUser, null)
-  const products = await invoke(getProducts, { skip: 0, take: 10 })
+export default function Home() {
+  // Fetch products with useQuery for client-side rendering
+  const [products] = useQuery(getProducts, { skip: 0, take: 10 })
 
   return (
     <>
-      {/* <Nav currentUser={currentUser} /> */}
-      <div className="flex flex-col gap-4 text-2xl text-center p-16">
+      <div className="flex flex-col gap-4 text-2xl text-center p-16 text-gray-700">
         <h1 className="text-4xl font-bold">Welcome to i-Zeek Data Solution and Network Services</h1>
         <p>
           Welcome to i-Zeek Network and Solution Services, where we prioritize quality, reliability,
@@ -52,6 +48,7 @@ export default async function Home() {
             ))}
           </div>
         </div>
+
         <div className="mt-8 p-8 border-t">
           <h2 className="text-3xl font-bold mb-4">Contact Us</h2>
           <p>
@@ -71,7 +68,7 @@ export default async function Home() {
             </strong>{" "}
             izeek.nsds@gmail.com
             <br />
-            <strong className="">
+            <strong className="mt-2">
               <HomeIcon />
               Address:
             </strong>{" "}
