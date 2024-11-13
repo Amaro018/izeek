@@ -86,8 +86,8 @@ const ProductList: FC = () => {
       if (result.isConfirmed) {
         await deleteProductMutation({ id: productId })
         Swal.fire("Deleted!", "The product has been deleted.", "success")
-        await refetch()
       }
+      await refetch()
     } catch (error) {
       Swal.fire("Error!", "An error occurred while deleting the product.", "error")
     }

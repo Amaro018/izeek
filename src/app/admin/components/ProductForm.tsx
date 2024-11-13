@@ -7,12 +7,12 @@ import getCategories from "../queries/getCategories"
 import { MenuItem, TextField, CircularProgress } from "@mui/material"
 import Swal from "sweetalert2"
 import uploadProductImage from "../../mutations/uploadProductImage"
-
 interface ProductFormProps {
   product?: any
+  onProductAdded: () => void // New prop for success callback
 }
 
-const ProductForm: FC<ProductFormProps> = ({ product }) => {
+const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
   const [createProductMutation, { isLoading }] = useMutation(createProduct)
   const [productName, setProductName] = useState<string>("")
   const [productDescription, setProductDescription] = useState<string>("")
@@ -43,7 +43,7 @@ const ProductForm: FC<ProductFormProps> = ({ product }) => {
             fileName: file.name,
             data: base64String,
           })
-
+          const uniqueFileName = `${Date.now()}-${fileUrl}`
           // Set the URL returned by the mutation
           setImageUrl(fileUrl)
         } catch (error) {
@@ -73,16 +73,7 @@ const ProductForm: FC<ProductFormProps> = ({ product }) => {
 
       // Call the mutation
       await createProductMutation(newProduct)
-
-      // Display success alert
-      Swal.fire({
-        title: "Created!",
-        text: "The product has been created.",
-        icon: "success",
-        customClass: {
-          popup: "swal-high-index",
-        },
-      })
+      onProductAdded()
     } catch (error) {
       Swal.fire({
         title: "Error",

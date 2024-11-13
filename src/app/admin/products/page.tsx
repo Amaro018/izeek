@@ -3,6 +3,7 @@ import { Box, Modal } from "@mui/material"
 import { useState } from "react"
 import ProductForm from "../components/ProductForm"
 import ProductList from "../components/ProductList"
+import Swal from "sweetalert2"
 
 const style = {
   position: "absolute",
@@ -27,6 +28,17 @@ export default function ProductPage() {
   const handleClose = () => {
     setOpen(false)
   }
+
+  const handleProductAdded = () => {
+    setOpen(false) // Close the modal
+    Swal.fire({
+      title: "Success!",
+      text: "The product has been added successfully.",
+      icon: "success",
+      confirmButtonText: "OK",
+    })
+  }
+
   return (
     <div className="w-full flex flex-col">
       <div className="bg-orange-200 p-4 rounded-t-lg flex flex-row items-center justify-between w-full">
@@ -49,7 +61,7 @@ export default function ProductPage() {
       >
         <Box sx={style}>
           <div className="p-2 z-10">
-            <ProductForm />
+            <ProductForm onProductAdded={handleProductAdded} />
           </div>
         </Box>
       </Modal>
