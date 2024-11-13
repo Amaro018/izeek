@@ -6,6 +6,7 @@ import createProduct from "../../mutations/createProduct"
 import getCategories from "../queries/getCategories"
 import { MenuItem, TextField, CircularProgress } from "@mui/material"
 import Swal from "sweetalert2"
+import uploadProductImage from "../../mutations/uploadProductImage"
 
 interface ProductFormProps {
   product?: any
@@ -31,11 +32,25 @@ const ProductForm: FC<ProductFormProps> = ({ product }) => {
     if (file) {
       setIsUploading(true)
       const reader = new FileReader()
-      reader.onloadend = () => {
+
+      reader.onloadend = async () => {
         const base64String = reader.result as string
-        setProductImage(base64String) // Set productImage as a base64 string
-        setImageUrl(base64String)
-        setIsUploading(false)
+        setProductImage(base64String) // Set productImage as a base64 string for preview
+
+        // Upload the image to server
+        try {
+          const fileUrl = await uploadProductImage({
+            fileName: file.name,
+            data: base64String,
+          })
+
+          // Set the URL returned by the mutation
+          setImageUrl(fileUrl)
+        } catch (error) {
+          console.error("Image upload failed:", error)
+        } finally {
+          setIsUploading(false)
+        }
       }
       reader.readAsDataURL(file)
     }
