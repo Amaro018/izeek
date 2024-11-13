@@ -10,7 +10,7 @@ interface UploadProductImageInput {
 
 export default resolver.pipe(async ({ fileName, data }: UploadProductImageInput) => {
   const buffer = Buffer.from(data.split(",")[1], "base64") // Convert base64 to buffer
-  const uniqueFileName = `${Date.now()}-${fileName}`
+  const uniqueFileName = `${fileName}`
   const filePath = path.join(process.cwd(), "public", "uploads", uniqueFileName)
 
   // Save the file to the local filesystem

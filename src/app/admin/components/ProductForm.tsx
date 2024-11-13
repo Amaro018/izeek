@@ -68,7 +68,7 @@ const ProductForm: FC<ProductFormProps> = ({ product }) => {
         srp: srp as number,
         sdp: sdp as number,
         categoryId: categoryId as number,
-        productImage, // base64 string
+        productImage: imageUrl, // base64 string
       }
 
       // Call the mutation
