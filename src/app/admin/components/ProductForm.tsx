@@ -1,19 +1,22 @@
 "use client"
 import { FC, useState, useEffect } from "react"
-
 import { useMutation, useQuery } from "@blitzjs/rpc"
 import createProduct from "../../mutations/createProduct"
+import updateProduct from "../../mutations/updateProduct"
 import getCategories from "../queries/getCategories"
 import { MenuItem, TextField, CircularProgress } from "@mui/material"
 import Swal from "sweetalert2"
 import uploadProductImage from "../../mutations/uploadProductImage"
+
 interface ProductFormProps {
   product?: any
-  onProductAdded: () => void // New prop for success callback
+  onProductAdded: () => void
 }
 
 const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
-  const [createProductMutation, { isLoading }] = useMutation(createProduct)
+  const [createProductMutation, { isLoading: isCreating }] = useMutation(createProduct)
+  const [updateProductMutation, { isLoading: isUpdating }] = useMutation(updateProduct)
+
   const [productName, setProductName] = useState<string>("")
   const [productDescription, setProductDescription] = useState<string>("")
   const [quantity, setQuantity] = useState<number | "">(1)
@@ -24,27 +27,36 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
   const [imageUrl, setImageUrl] = useState<string>("")
   const [isUploading, setIsUploading] = useState(false)
 
-  // Fetch categories with useQuery
   const [categories] = useQuery(getCategories, {}, { suspense: true })
+
+  // Pre-fill fields if editing an existing product
+  useEffect(() => {
+    if (product) {
+      setProductName(product.productName || "")
+      setProductDescription(product.productDescription || "")
+      setQuantity(product.quantity || 1)
+      setSrp(product.srp || "")
+      setSdp(product.sdp || "")
+      setCategoryId(product.categoryId || "")
+      setImageUrl(product.productImage || "")
+    }
+  }, [product])
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       setIsUploading(true)
       const reader = new FileReader()
-
       reader.onloadend = async () => {
         const base64String = reader.result as string
-        setProductImage(base64String) // Set productImage as a base64 string for preview
+        setProductImage(base64String)
 
-        // Upload the image to server
         try {
           const fileUrl = await uploadProductImage({
             fileName: file.name,
             data: base64String,
           })
           const uniqueFileName = `${Date.now()}-${fileUrl}`
-          // Set the URL returned by the mutation
           setImageUrl(fileUrl)
         } catch (error) {
           console.error("Image upload failed:", error)
@@ -59,34 +71,38 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    try {
-      // Prepare the data for the mutation
-      const newProduct = {
-        productName,
-        productDescription,
-        quantity: quantity as number,
-        srp: srp as number,
-        sdp: sdp as number,
-        categoryId: categoryId as number,
-        productImage: imageUrl, // base64 string
-      }
+    const productData = {
+      productName,
+      productDescription,
+      quantity: quantity as number,
+      srp: srp as number,
+      sdp: sdp as number,
+      categoryId: categoryId as number,
+      productImage: imageUrl,
+    }
 
-      // Call the mutation
-      await createProductMutation(newProduct)
+    try {
+      if (product) {
+        // Update existing product
+        await updateProductMutation({ id: product.id, ...productData })
+        Swal.fire("Updated!", "Product updated successfully.", "success")
+      } else {
+        // Create a new product
+        await createProductMutation(productData)
+        Swal.fire("Created!", "Product created successfully.", "success")
+      }
       onProductAdded()
     } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "An error occurred while creating the product.",
-        icon: "error",
-      })
+      Swal.fire("Error", "An error occurred while saving the product.", "error")
       console.error(error)
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-      <p className="text-lg font-bold mb-4 text-center">Adding New Product</p>
+      <p className="text-lg font-bold mb-4 text-center">
+        {product ? "Edit Product" : "Add New Product"}
+      </p>
 
       <div className="w-full flex flex-row gap-4">
         <TextField
@@ -122,6 +138,7 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
         maxRows={4}
         required
       />
+
       <div className="w-full flex flex-row gap-4 mt-4">
         <TextField
           label="Quantity"
@@ -150,6 +167,7 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
           fullWidth
         />
       </div>
+
       <label htmlFor="productImage">Product Image</label>
       <input
         id="productImage"
@@ -164,9 +182,9 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
       <button
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         type="submit"
-        disabled={isLoading}
+        disabled={isCreating || isUpdating}
       >
-        {isLoading ? "Creating..." : "Create"}
+        {isCreating ? "Creating..." : isUpdating ? "Updating..." : product ? "Update" : "Create"}
       </button>
     </form>
   )

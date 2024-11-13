@@ -6,26 +6,23 @@ import getCategories from "../queries/getCategories" // Adjust the import path a
 import deleteProduct from "../../mutations/deleteProduct"
 import Swal from "sweetalert2"
 import { FC } from "react"
+import MoreVertIcon from "@mui/icons-material/MoreVert"
+import EditIcon from "@mui/icons-material/Edit"
 import {
   Card,
   CardHeader,
   CardContent,
   Typography,
-  CardActions,
   IconButton,
-  Collapse,
-  Avatar,
   CardMedia,
-  Button,
-  Chip,
-  Box,
-  Grid,
   TextField,
-  Select,
   MenuItem,
-  InputLabel,
+  Menu,
+  Modal,
+  Box,
 } from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
+import ProductForm from "./ProductForm"
 
 interface Product {
   id: number
@@ -47,28 +44,60 @@ const style = {
   margin: "auto",
 }
 
+const styleNew = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 1000,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: "10px",
+}
+
 const ProductList: FC = () => {
   const [deleteProductMutation] = useMutation(deleteProduct)
   const [products, { refetch }] = useQuery(getProducts, { skip: 0, take: 10 })
   const [categories] = useQuery(getCategories, {}) // Fetch categories
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOption, setSortOption] = useState("default")
-  const [selectedCategory, setSelectedCategory] = useState("all") // New state for category filter
+  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [openEdit, setOpenEdit] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
 
-  // Filter and sort the products
+  const handleEdit = (product) => {
+    setSelectedProduct(product) // Set the selected product for editing
+    setOpenEdit(true)
+  }
+
+  const handleCloseEdit = () => {
+    setOpenEdit(false)
+    setSelectedProduct(null) // Clear the selected product after closing the modal
+  }
+
+  const handleProductAdded = () => {
+    setOpenEdit(false)
+    setSelectedProduct(null)
+    Swal.fire({
+      title: "Success!",
+      text: "The product has been added or updated successfully.",
+      icon: "success",
+      confirmButtonText: "OK",
+    })
+    refetch() // Refetch the products list to include the update
+  }
+
   const filteredAndSortedProducts = products
     .filter((product) => {
-      // Filter by search term and selected category
       const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesCategory =
         selectedCategory === "all" || product.category.id === parseInt(selectedCategory)
       return matchesSearch && matchesCategory
     })
     .sort((a, b) => {
-      // Sort by selected option
-      if (sortOption === "srpAsc") {
-        return a.srp - b.srp
-      }
+      if (sortOption === "srpAsc") return a.srp - b.srp
       return 0
     })
 
@@ -86,11 +115,21 @@ const ProductList: FC = () => {
       if (result.isConfirmed) {
         await deleteProductMutation({ id: productId })
         Swal.fire("Deleted!", "The product has been deleted.", "success")
+        await refetch()
       }
-      await refetch()
     } catch (error) {
       Swal.fire("Error!", "An error occurred while deleting the product.", "error")
     }
+  }
+
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
   }
 
   return (
@@ -143,18 +182,44 @@ const ProductList: FC = () => {
             key={product.id}
             sx={{
               width: 250,
-              display: "flex flex-column",
-              justifyContent: "center",
-              alignItems: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "justify-between",
             }}
           >
             <CardHeader
               title={product.productName}
               subheader={product.category.name}
               action={
-                <IconButton aria-label="settings" onClick={() => handleDelete(product.id)}>
-                  <DeleteIcon />
-                </IconButton>
+                <>
+                  <IconButton aria-label="settings" onClick={handleMenuOpen}>
+                    <MoreVertIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                  >
+                    <MenuItem
+                      onClick={() => {
+                        handleEdit(product)
+                        handleMenuClose()
+                      }}
+                    >
+                      <EditIcon fontSize="small" style={{ marginRight: 8 }} /> Edit
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        handleDelete(product.id)
+                        handleMenuClose()
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" style={{ marginRight: 8 }} /> Delete
+                    </MenuItem>
+                  </Menu>
+                </>
               }
             />
             <CardMedia
@@ -168,20 +233,25 @@ const ProductList: FC = () => {
                 {product.productDescription}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Quantity : {product.quantity}
+                Quantity: {product.quantity}
               </Typography>
-              <div className="flex flex-row gap-4 justify-between">
-                <Typography variant="h6" color="text.secondary">
-                  SRP : {product.srp}
-                </Typography>
-                <Typography variant="h6" color="text.secondary">
-                  SDP : {product.sdp}
-                </Typography>
-              </div>
+              <Typography color="text.secondary">SRP: {product.srp}</Typography>
+              <Typography color="text.secondary">SDP: {product.sdp}</Typography>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <Modal
+        open={openEdit}
+        onClose={handleCloseEdit}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={styleNew}>
+          <ProductForm product={selectedProduct} onProductAdded={handleProductAdded} />
+        </Box>
+      </Modal>
     </div>
   )
 }
