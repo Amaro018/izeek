@@ -12,7 +12,6 @@ export const metadata = {
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   // Fetch cookies asynchronously
-  const currentUser = await invoke(getCurrentUser, null)
 
   // Ensure asynchronous handling for useAuthenticatedBlitzContext
   await useAuthenticatedBlitzContext({
@@ -23,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      <Nav currentUser={currentUser ? currentUser : null} />
+      {/* <Nav currentUser={currentUser ? currentUser : null} /> */}
       <div className="flex flex-row p-16 gap-16">
         <Sidebar />
         <main className="w-full">{children}</main>

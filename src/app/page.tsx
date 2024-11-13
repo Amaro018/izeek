@@ -11,12 +11,12 @@ import EmailIcon from "@mui/icons-material/Email"
 import PhoneIcon from "@mui/icons-material/Phone"
 
 export default async function Home() {
-  const currentUser = await invoke(getCurrentUser, null)
+  // const currentUser = await invoke(getCurrentUser, null)
   const products = await invoke(getProducts, { skip: 0, take: 10 })
 
   return (
     <>
-      <Nav currentUser={currentUser} />
+      {/* <Nav currentUser={currentUser} /> */}
       <div className="flex flex-col gap-4 text-2xl text-center p-16">
         <h1 className="text-4xl font-bold">Welcome to i-Zeek Data Solution and Network Services</h1>
         <p>
