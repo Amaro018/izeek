@@ -11,7 +11,7 @@ export default resolver.pipe(
       quantity: z.number().int().min(0),
       srp: z.number().min(0),
       sdp: z.number().min(0),
-      categoryId: z.number().int().min(1),
+      categoryId: z.string(),
       productImage: z.string().url().optional(),
     })
   ),
@@ -27,7 +27,7 @@ export default resolver.pipe(
         quantity,
         srp,
         sdp,
-        categoryId: parseInt(categoryId),
+        categoryId,
         productImage, // The image URL from the file upload
       },
     })

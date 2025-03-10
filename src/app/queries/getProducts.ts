@@ -1,6 +1,5 @@
-// queries/getProducts.ts
 import { Ctx } from "blitz"
-import db from "db" // Assuming db is set up with Prisma
+import db from "db"
 
 interface GetProductsInput {
   skip?: number
@@ -8,14 +7,18 @@ interface GetProductsInput {
 }
 
 export default async function getProducts({ skip = 0, take = 10 }: GetProductsInput, ctx: Ctx) {
-  // Remove or comment out the authorization check to make it accessible to guests
+  // Allow guests to access products without authorization
+  // Remove or comment out the authorization check if not needed
   // ctx.session.$authorize()
 
   const products = await db.product.findMany({
     skip,
     take,
     include: {
-      category: true, // Include related category (adjust based on your schema)
+      category: true, // Ensure this matches your Prisma schema
+    },
+    orderBy: {
+      createdAt: "desc", // Optionally order products by the newest first
     },
   })
 

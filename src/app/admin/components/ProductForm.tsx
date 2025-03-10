@@ -22,7 +22,7 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
   const [quantity, setQuantity] = useState<number | "">(1)
   const [srp, setSrp] = useState<number | "">("")
   const [sdp, setSdp] = useState<number | "">("")
-  const [categoryId, setCategoryId] = useState<number | "">("")
+  const [categoryId, setCategoryId] = useState<string | "">("")
   const [productImage, setProductImage] = useState<string>("")
   const [imageUrl, setImageUrl] = useState<string>("")
   const [isUploading, setIsUploading] = useState(false)
@@ -77,7 +77,7 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
       quantity: quantity as number,
       srp: srp as number,
       sdp: sdp as number,
-      categoryId: categoryId as number,
+      categoryId: categoryId as string,
       productImage: imageUrl,
     }
 
@@ -118,11 +118,11 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
           select
           label="Select Category"
           value={categoryId}
-          onChange={(e) => setCategoryId(Number(e.target.value))}
+          onChange={(e) => setCategoryId(e.target.value as string)}
           helperText="Please select a category"
           fullWidth
         >
-          {categories.map((category) => (
+          {categories.map((category: any) => (
             <MenuItem key={category.id} value={category.id}>
               {category.name}
             </MenuItem>

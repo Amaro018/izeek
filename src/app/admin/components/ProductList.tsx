@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react"
 import * as React from "react"
 import { useMutation, useQuery } from "@blitzjs/rpc"
@@ -77,17 +78,17 @@ const ProductList: FC = () => {
     setSelectedProduct(null) // Clear the selected product after closing the modal
   }
 
-  const handleProductAdded = () => {
-    setOpenEdit(false)
-    setSelectedProduct(null)
-    Swal.fire({
-      title: "Success!",
-      text: "The product has been added or updated successfully.",
-      icon: "success",
-      confirmButtonText: "OK",
-    })
-    refetch() // Refetch the products list to include the update
-  }
+  // const handleProductAdded = () => {
+  //   setOpenEdit(false)
+  //   setSelectedProduct(null)
+  //   Swal.fire({
+  //     title: "Success!",
+  //     text: "The product has been added or updated successfully.",
+  //     icon: "success",
+  //     confirmButtonText: "OK",
+  //   })
+  //   refetch() // Refetch the products list to include the update
+  // }
 
   const filteredAndSortedProducts = products
     .filter((product) => {
@@ -132,8 +133,38 @@ const ProductList: FC = () => {
     setAnchorEl(null)
   }
 
+  const [open, setOpen] = useState(false)
+
+  const handleOpen = () => {
+    setOpen(true)
+    console.log("open")
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleProductAdded = () => {
+    setOpen(false) // Close the modal
+    Swal.fire({
+      title: "Success!",
+      text: "The product has been added successfully.",
+      icon: "success",
+      confirmButtonText: "OK",
+    })
+  }
+
   return (
     <div>
+      <div className="bg-orange-200 p-4 rounded-t-lg flex flex-row items-center justify-between w-full">
+        <h1 className="text-4xl font-bold text-white">Products</h1>
+        <button
+          className="bg-green-500 px-4 py-2 text-2xl text-white font-bold rounded-md hover:bg-green-600 transition-colors duration-300"
+          onClick={handleOpen}
+        >
+          + Add Product
+        </button>
+      </div>
       <div className="flex flex-row gap-4 mt-8">
         {/* Search Field */}
         <TextField
@@ -250,6 +281,19 @@ const ProductList: FC = () => {
       >
         <Box sx={styleNew}>
           <ProductForm product={selectedProduct} onProductAdded={handleProductAdded} />
+        </Box>
+      </Modal>
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={styleNew}>
+          <div className="p-2 z-10">
+            <ProductForm onProductAdded={handleProductAdded} />
+          </div>
         </Box>
       </Modal>
     </div>
