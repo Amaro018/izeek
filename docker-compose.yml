@@ -1,0 +1,26 @@
+services:
+  app:
+    build: .
+    container_name: izeek
+    restart: always
+    ports:
+      - "3006:3000"
+    # Values come from .env locally, or Portainer's stack env vars in production.
+    # No secrets are committed. See .env.example for the required keys.
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - APP_ORIGIN=${APP_ORIGIN}
+      - BASE_URL=${BASE_URL}
+      - SESSION_SECRET_KEY=${SESSION_SECRET_KEY}
+    volumes:
+      # Persist uploaded product images across redeploys
+      - izeek_uploads:/app/public/uploads
+    networks:
+      - cloudflare_net
+
+networks:
+  cloudflare_net:
+    external: true
+
+volumes:
+  izeek_uploads:
