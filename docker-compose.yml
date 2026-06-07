@@ -11,6 +11,7 @@ services:
     restart: "no"
     networks:
       - cloudflare_net
+      - db_net
 
   app:
     build: .
@@ -32,10 +33,15 @@ services:
       - izeek_uploads:/app/public/uploads
     networks:
       - cloudflare_net
+      - db_net
 
 networks:
   cloudflare_net:
     external: true
+  # MariaDB lives on its own external network (created by the mariadb stack).
+  db_net:
+    external: true
+    name: mariadb_mariadb_network
 
 volumes:
   izeek_uploads:
