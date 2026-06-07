@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import Nav from "./components/Nav"
 import Footer from "./components/Footer"
 import { CartProvider } from "./components/CartContext"
+import ThemeRegistry from "./ThemeRegistry"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -16,13 +17,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <BlitzProvider>
-          <CartProvider>
-            <Nav />
-            {children}
-            <Footer />
-          </CartProvider>
-        </BlitzProvider>
+        <ThemeRegistry>
+          <BlitzProvider>
+            <CartProvider>
+              <Nav />
+              {children}
+              <Footer />
+            </CartProvider>
+          </BlitzProvider>
+        </ThemeRegistry>
       </body>
     </html>
   )
