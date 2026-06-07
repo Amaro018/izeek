@@ -1,8 +1,24 @@
 services:
+  # One-shot: sync the schema (and seed) before the app starts. Exits when done.
+  migrate:
+    build:
+      context: .
+      target: builder
+    container_name: izeek-migrate
+    command: sh -c "npx prisma db push && npx blitz db seed"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    restart: "no"
+    networks:
+      - cloudflare_net
+
   app:
     build: .
     container_name: izeek
     restart: always
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     ports:
       - "3006:3000"
     # Values come from .env locally, or Portainer's stack env vars in production.
@@ -13,7 +29,6 @@ services:
       - BASE_URL=${BASE_URL}
       - SESSION_SECRET_KEY=${SESSION_SECRET_KEY}
     volumes:
-      # Persist uploaded product images across redeploys
       - izeek_uploads:/app/public/uploads
     networks:
       - cloudflare_net
