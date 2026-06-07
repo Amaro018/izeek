@@ -7,7 +7,13 @@ import LocationOnIcon from "@mui/icons-material/LocationOn"
 import FacebookIcon from "@mui/icons-material/Facebook"
 
 export default function Footer() {
-  const [site] = useQuery(getSiteSettings, null, { suspense: false })
+  const [site] = useQuery(getSiteSettings, null, {
+    suspense: false,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
+  })
 
   return (
     <footer className="w-full border-t bg-white print:hidden">
