@@ -9,7 +9,13 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber"
 import PaidIcon from "@mui/icons-material/Paid"
 
 export default function AdminDashboard() {
-  const [stats] = useQuery(getStats, {})
+  const [statsData] = useQuery(getStats, {})
+  const stats = statsData ?? {
+    productCount: 0,
+    categoryCount: 0,
+    lowStockCount: 0,
+    inventoryValue: 0,
+  }
 
   return (
     <div>

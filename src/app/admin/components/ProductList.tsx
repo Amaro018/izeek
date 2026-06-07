@@ -26,8 +26,10 @@ import DeleteIcon from "@mui/icons-material/Delete"
 
 const ProductList: FC = () => {
   const [deleteProductMutation] = useMutation(deleteProduct)
-  const [products, { refetch }] = useQuery(getProducts, { skip: 0, take: 100 })
-  const [categories] = useQuery(getCategories, {})
+  const [productsData, { refetch }] = useQuery(getProducts, { skip: 0, take: 100 })
+  const products = productsData ?? []
+  const [categoriesData] = useQuery(getCategories, {})
+  const categories = categoriesData ?? []
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOption, setSortOption] = useState("default")
   const [selectedCategory, setSelectedCategory] = useState("all")

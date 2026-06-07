@@ -28,7 +28,8 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
   const [imageUrl, setImageUrl] = useState<string>("")
   const [isUploading, setIsUploading] = useState(false)
 
-  const [categories] = useQuery(getCategories, {}, { suspense: true })
+  const [categoriesData] = useQuery(getCategories, {})
+  const categories = categoriesData ?? []
 
   // Pre-fill fields if editing an existing product
   useEffect(() => {
@@ -104,7 +105,7 @@ const ProductForm: FC<ProductFormProps> = ({ product, onProductAdded }) => {
     }
   }
 
-  if (categories.length === 0) {
+  if (categoriesData && categories.length === 0) {
     return (
       <div className="text-center py-8">
         <p className="text-lg font-bold mb-2">No categories available</p>
