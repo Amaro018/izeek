@@ -50,7 +50,7 @@ const services = [
 ]
 
 export default function Home() {
-  const [products] = useQuery(getProducts, { skip: 0, take: 8 })
+  const [products] = useQuery(getProducts, { skip: 0, take: 8 }, { suspense: false })
   const { addItem } = useCart()
 
   return (
@@ -101,7 +101,7 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-      {products.length > 0 && (
+      {(products?.length ?? 0) > 0 && (
         <section className="py-16 px-8 bg-gray-50">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">Featured Products</h2>
           <p className="text-center text-gray-500 mb-10">Browse our latest offerings.</p>

@@ -22,14 +22,20 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("")
   const [categoryId, setCategoryId] = useState("all")
 
-  const [categories] = useQuery(getCategories, {})
+  const [categoriesData] = useQuery(getCategories, {}, { suspense: false })
+  const categories = categoriesData ?? []
   // Server-side search + category filter (debounce-free; Blitz caches per key).
-  const [products] = useQuery(getProducts, {
-    skip: 0,
-    take: 100,
-    search: search || undefined,
-    categoryId,
-  })
+  const [productsData] = useQuery(
+    getProducts,
+    {
+      skip: 0,
+      take: 100,
+      search: search || undefined,
+      categoryId,
+    },
+    { suspense: false }
+  )
+  const products = productsData ?? []
 
   return (
     <div className="min-h-screen bg-gray-50">
