@@ -4,13 +4,13 @@ import { z } from "zod"
 
 // Define the schema for the update product input
 const UpdateProductInput = z.object({
-  id: z.number(),
+  id: z.string(),
   productName: z.string(),
   productDescription: z.string(),
   quantity: z.number(),
   srp: z.number(),
   sdp: z.number(),
-  categoryId: z.number(),
+  categoryId: z.string(),
   productImage: z.string().optional(),
 })
 

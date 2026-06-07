@@ -22,6 +22,15 @@ const seed = async () => {
     })
   }
 
+  // Seed default categories
+  const defaultCategories = ["CCTV", "DVR", "HDD"]
+  for (const name of defaultCategories) {
+    const existing = await db.category.findUnique({ where: { name } })
+    if (!existing) {
+      await db.category.create({ data: { name } })
+    }
+  }
+
   console.log("Seed completed!")
 }
 

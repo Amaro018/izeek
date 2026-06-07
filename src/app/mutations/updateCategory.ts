@@ -5,7 +5,7 @@ import { resolver } from "@blitzjs/rpc"
 import { z } from "zod"
 
 const UpdateCategory = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z.string().min(1),
   // Add other fields as necessary
 })

@@ -1,26 +1,24 @@
 "use client"
-
-import React, { useEffect } from "react"
-import Link from "next/link"
-import { useQuery, useMutation } from "@blitzjs/rpc"
-import getCategories from "./../queries/getCategories"
+import { useState } from "react"
+import { useMutation } from "@blitzjs/rpc"
 import deleteCategory from "../../mutations/deleteCategory"
 import Swal from "sweetalert2"
-import { useState } from "react"
 import { Box, Modal } from "@mui/material"
+import EditIcon from "@mui/icons-material/Edit"
+import DeleteIcon from "@mui/icons-material/Delete"
 import CategoryForm from "./CategoryForm"
 
-const style = {
+const modalStyle = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: 420,
   bgcolor: "background.paper",
-  border: "2px solid #000",
+  border: "none",
   boxShadow: 24,
   p: 4,
-  borderRadius: "10px",
+  borderRadius: "16px",
 }
 
 export default function CategoryList({
@@ -39,33 +37,42 @@ export default function CategoryList({
   onSubmit?: any
 }) {
   const [deleteCategoryMutation] = useMutation(deleteCategory)
+  const [selectedCategory, setSelectedCategory] = useState<any>(null)
 
-  const [selectedCategory, setSelectedCategory] = useState(null)
-
-  // Function to handle deletion with confirmation
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string, name: string, productCount: number) => {
+    if (productCount > 0) {
+      Swal.fire(
+        "Cannot delete",
+        `"${name}" still has ${productCount} product(s). Move or delete them first.`,
+        "warning"
+      )
+      return
+    }
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: `Delete "${name}"?`,
+      text: "This category has no products and will be removed.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
       confirmButtonText: "Yes, delete it!",
     })
-
     if (result.isConfirmed) {
-      await deleteCategoryMutation({ id })
-      Swal.fire("Deleted!", "The category has been deleted.", "success")
+      try {
+        await deleteCategoryMutation({ id })
+        Swal.fire("Deleted!", "The category has been deleted.", "success")
+        await categories?.refetch()
+      } catch (err: any) {
+        Swal.fire("Error!", err?.message || "Failed to delete category.", "error")
+      }
     }
-    await categories?.refetch()
   }
 
   const handleUpdate = (category: any) => {
     setSelectedCategory(category)
-    handleModal?.setOpen(true)
     inputName?.setName(category.name)
     isEditMode?.setIsEditMode(true)
+    handleModal?.setOpen(true)
   }
 
   const handleClose = () => {
@@ -73,58 +80,89 @@ export default function CategoryList({
     setSelectedCategory(null)
   }
 
+  const list = categories?.categories ?? []
+
   return (
     <div className="w-full">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border-r-2 border-b-2">Name</th>
-            <th className="p-2 border-r-2 border-b-2">Created At</th>
-            <th className="p-2 border-r-2 border-b-2">Updated At</th>
-            <th className="p-2 border-b-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories?.categories.map((category: any) => (
-            <tr key={category.id}>
-              <td className="p-2 border-b-2 text-center font-bold">
-                {category.name.toUpperCase()}
-              </td>
-              <td className="p-2 border-b-2 text-center">
-                {new Date(category.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </td>
-              <td className="p-2 border-b-2 text-center">
-                {new Date(category.updatedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </td>
-              <td className="p-2 border-b-2 flex flex-row gap-4 justify-center">
-                <button
-                  onClick={() => handleUpdate(category)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
+      {list.length === 0 ? (
+        <div className="text-center py-16 text-gray-400">
+          <p className="text-xl">No categories yet.</p>
+          <p className="text-sm mt-1">Add your first category above.</p>
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-b-xl border border-gray-200">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
+                <th className="px-4 py-3 text-left font-semibold">Name</th>
+                <th className="px-4 py-3 text-center font-semibold">Products</th>
+                <th className="px-4 py-3 text-left font-semibold">Created</th>
+                <th className="px-4 py-3 text-left font-semibold">Updated</th>
+                <th className="px-4 py-3 text-center font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((category: any, idx: number) => (
+                <tr
+                  key={category.id}
+                  className={`border-t border-gray-100 hover:bg-orange-50 transition-colors ${
+                    idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                  }`}
                 >
-                  Update
-                </button>
-                <button
-                  onClick={() => handleDelete(category.id)}
-                  className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  <td className="px-4 py-3 font-semibold text-gray-800 capitalize">
+                    {category.name}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className="inline-block bg-orange-100 text-orange-700 font-semibold text-xs px-2.5 py-1 rounded-full">
+                      {category._count?.products ?? 0}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-500">
+                    {new Date(category.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </td>
+                  <td className="px-4 py-3 text-gray-500">
+                    {new Date(category.updatedAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => handleUpdate(category)}
+                        className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium px-3 py-1.5 rounded-lg transition-colors text-xs"
+                      >
+                        <EditIcon style={{ fontSize: 14 }} />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDelete(category.id, category.name, category._count?.products ?? 0)
+                        }
+                        className="flex items-center gap-1 bg-red-50 hover:bg-red-100 text-red-600 font-medium px-3 py-1.5 rounded-lg transition-colors text-xs"
+                      >
+                        <DeleteIcon style={{ fontSize: 14 }} />
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="px-4 py-2 bg-gray-50 border-t border-gray-100 text-xs text-gray-400">
+            {list.length} categor{list.length === 1 ? "y" : "ies"}
+          </div>
+        </div>
+      )}
 
       <Modal open={handleModal?.open ?? false} onClose={handleClose}>
-        <Box sx={style}>
+        <Box sx={modalStyle}>
           <CategoryForm
             isEditMode={isEditMode?.isEditMode}
             category={selectedCategory}

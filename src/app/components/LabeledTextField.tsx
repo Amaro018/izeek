@@ -1,3 +1,4 @@
+"use client"
 import { forwardRef, PropsWithoutRef } from "react"
 import { useField, useFormikContext, ErrorMessage } from "formik"
 
@@ -18,9 +19,15 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
 
     return (
       <div {...outerProps}>
-        <label>
+        <label className="flex flex-col items-start text-base">
           {label}
-          <input {...input} disabled={isSubmitting} {...props} ref={ref} />
+          <input
+            {...input}
+            disabled={isSubmitting}
+            {...props}
+            ref={ref}
+            className={`text-base py-1 px-2 rounded border border-purple-700 appearance-none mt-2 ${props.className ?? ""}`}
+          />
         </label>
 
         <ErrorMessage name={name}>
@@ -30,23 +37,6 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
             </div>
           )}
         </ErrorMessage>
-
-        <style jsx>{`
-          label {
-            display: flex;
-            flex-direction: column;
-            align-items: start;
-            font-size: 1rem;
-          }
-          input {
-            font-size: 1rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 3px;
-            border: 1px solid purple;
-            appearance: none;
-            margin-top: 0.5rem;
-          }
-        `}</style>
       </div>
     )
   }

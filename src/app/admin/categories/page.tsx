@@ -5,10 +5,10 @@ import Box from "@mui/material/Box"
 import CategoryForm from "../components/CategoryForm"
 import { useState } from "react"
 import { useQuery, useMutation } from "@blitzjs/rpc"
-import getCategories from "../queries/getCategories" // Ensure this is the correct path
+import getCategories from "../queries/getCategories"
 import CategoryList from "../components/CategoryList"
 import createCategory from "../mutations/createCategory"
-import updateCategory from "../../mutations/updateCategory" // Import update mutation
+import updateCategory from "../../mutations/updateCategory"
 import Swal from "sweetalert2"
 
 const style = {
@@ -16,103 +16,91 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: 420,
   bgcolor: "background.paper",
-  border: "2px solid #000",
+  border: "none",
   boxShadow: 24,
   p: 4,
-  borderRadius: "10px",
+  borderRadius: "16px",
 }
 
 const CategoryPage = () => {
   const [open, setOpen] = useState(false)
-  const [isEditMode, setIsEditMode] = useState(false) // Track whether form is in edit mode
-  const [selectedCategory, setSelectedCategory] = useState(null) // Track the selected category for editing
-
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<any>(null)
   const [createCategoryMutation] = useMutation(createCategory)
   const [updateCategoryMutation] = useMutation(updateCategory)
-
   const [category, setCategory] = useState<any>(null)
   const [name, setName] = useState<string>("")
-
   const [categories, { isLoading, isError, refetch }] = useQuery(getCategories, {})
 
   const handleOpenAdd = () => {
-    setIsEditMode(false) // Open in add mode
+    setIsEditMode(false)
     setSelectedCategory(null)
+    setCategory(null)
+    setName("")
     setOpen(true)
   }
 
   const handleClose = () => {
     setOpen(false)
+    setName("")
+    setCategory(null)
   }
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log(category ? "may category" : "walang cateory")
-    if (category) {
-      const res = await updateCategoryMutation({ id: category.id, name })
-      if (res) {
-        setOpen(false)
+    try {
+      if (category) {
+        await updateCategoryMutation({ id: category.id, name })
         Swal.fire({
           title: "Updated!",
-          text: "The category has been Updated.",
+          text: "The category has been updated.",
           icon: "success",
-          customClass: {
-            popup: "swal-high-index",
-          },
+          customClass: { popup: "swal-high-index" },
         })
-      }
-      refetch()
-      // else swal err
-    } else {
-      const res = await createCategoryMutation({ name })
-      if (res) {
-        setOpen(false)
+      } else {
+        await createCategoryMutation({ name })
         Swal.fire({
           title: "Created!",
           text: "The category has been created.",
           icon: "success",
-          customClass: {
-            popup: "swal-high-index",
-          },
+          customClass: { popup: "swal-high-index" },
         })
       }
-      // else swal err
+      setOpen(false)
+      setName("")
+      setCategory(null)
+      await refetch()
+    } catch (err: any) {
+      Swal.fire("Error", err.message || "Something went wrong.", "error")
     }
-    refetch()
-    window.location.reload()
   }
 
   return (
     <div className="w-full flex flex-col">
-      <div className="bg-orange-200 p-4 rounded-t-lg flex flex-row items-center justify-between">
-        <h1 className="text-4xl font-bold">Categories</h1>
+      <div className="bg-orange-500 p-5 rounded-t-xl flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-white">Categories</h1>
         <button
-          className="bg-green-400 px-4 py-2 text-2xl text-white rounded-md"
+          className="bg-white text-orange-500 font-bold px-5 py-2 rounded-lg hover:bg-orange-50 transition-colors"
           onClick={handleOpenAdd}
         >
           + Add Category
         </button>
       </div>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+
+      <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
-          <div className="p-2">
-            <CategoryForm
-              initialValues={isEditMode ? selectedCategory : {}}
-              onSubmit={handleSubmit}
-              isEditMode={isEditMode}
-              setCategory={setCategory}
-              inputName={{ name, setName }}
-            />
-          </div>
+          <CategoryForm
+            initialValues={isEditMode ? selectedCategory : {}}
+            onSubmit={handleSubmit}
+            isEditMode={isEditMode}
+            setCategory={setCategory}
+            inputName={{ name, setName }}
+          />
         </Box>
       </Modal>
+
       <CategoryList
         isEditMode={{ isEditMode, setIsEditMode }}
         handleModal={{ open, setOpen }}

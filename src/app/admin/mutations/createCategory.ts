@@ -22,6 +22,12 @@ export default async function createCategory(input: { name: string }, ctx: Ctx) 
   // Lowercase the category name
   const lowercaseName = name.toLowerCase()
 
+  // Friendly guard against the unique constraint on Category.name.
+  const existing = await db.category.findUnique({ where: { name: lowercaseName } })
+  if (existing) {
+    throw new Error(`A category named "${lowercaseName}" already exists.`)
+  }
+
   // Create the category in the database
   const category = await db.category.create({
     data: {

@@ -1,37 +1,45 @@
-import { useMutation, useQuery } from "@blitzjs/rpc"
-import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
-import createCategory from "../mutations/createCategory"
-import updateCategory from "../../mutations/updateCategory"
+"use client"
+import { useEffect } from "react"
 import { TextField } from "@mui/material"
-import getCategories from "../queries/getCategories"
 
-const CategoryForm = ({ initialValues, isEditMode, category, onSubmit, setCategory, inputName }: { initialValues?: any, isEditMode?: boolean, category?: any, onSubmit?: any, setCategory?: any, inputName?: { name: string, setName: any } }) => {
-  const router = useRouter()
-  const [createCategoryMutation] = useMutation(createCategory)
-  const [updateCategoryMutation] = useMutation(updateCategory)
-  const [categories, { refetch }] = useQuery(getCategories, {})
-
+const CategoryForm = ({
+  isEditMode,
+  category,
+  onSubmit,
+  setCategory,
+  inputName,
+}: {
+  isEditMode?: boolean
+  category?: any
+  onSubmit?: any
+  setCategory?: any
+  inputName?: { name: string; setName: any }
+  initialValues?: any
+}) => {
   useEffect(() => {
-    setCategory(category)
+    setCategory?.(category)
   }, [category, setCategory])
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4 z">
-      <div>
-        <p className="text-2xl text-center mb-4">{isEditMode ? "Update Category" : "Create Category"}</p>
-      </div>
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <p className="text-xl font-bold text-center text-gray-800">
+        {isEditMode ? "Update Category" : "Create Category"}
+      </p>
       <TextField
         label="Category Name"
         variant="outlined"
-        value={inputName?.name}
-        onChange={(e: any) => inputName?.setName(e.target.value)}
+        size="small"
+        value={inputName?.name ?? ""}
+        onChange={(e) => inputName?.setName(e.target.value)}
+        required
+        fullWidth
+        autoFocus
       />
       <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-xl transition-colors"
         type="submit"
       >
-        {category ? "Update" : "Create"}
+        {isEditMode ? "Update Category" : "Create Category"}
       </button>
     </form>
   )

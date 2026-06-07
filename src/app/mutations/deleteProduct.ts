@@ -4,7 +4,7 @@ import { resolver } from "@blitzjs/rpc"
 import { z } from "zod"
 
 const DeleteProduct = z.object({
-  id: z.number(),
+  id: z.string(),
 })
 
 export default resolver.pipe(

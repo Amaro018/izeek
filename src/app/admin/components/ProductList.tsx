@@ -1,9 +1,10 @@
 "use client"
 import { useState } from "react"
 import * as React from "react"
+import Link from "next/link"
 import { useMutation, useQuery } from "@blitzjs/rpc"
-import getProducts from "../../queries/getProducts" // Adjust the import path as necessary
-import getCategories from "../queries/getCategories" // Adjust the import path as necessary
+import getProducts from "../../queries/getProducts"
+import getCategories from "../queries/getCategories"
 import deleteProduct from "../../mutations/deleteProduct"
 import Swal from "sweetalert2"
 import { FC } from "react"
@@ -19,283 +20,217 @@ import {
   TextField,
   MenuItem,
   Menu,
-  Modal,
-  Box,
+  Chip,
 } from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete"
-import ProductForm from "./ProductForm"
-
-interface Product {
-  id: number
-  productName: string
-  productDescription: string
-  quantity: number
-  srp: number
-  sdp: number
-  productImage?: string
-  category: {
-    id: number
-    name: string
-  }
-}
-
-const style = {
-  height: "100px",
-  width: "100px",
-  margin: "auto",
-}
-
-const styleNew = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 1000,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-  borderRadius: "10px",
-}
 
 const ProductList: FC = () => {
   const [deleteProductMutation] = useMutation(deleteProduct)
-  const [products, { refetch }] = useQuery(getProducts, { skip: 0, take: 10 })
-  const [categories] = useQuery(getCategories, {}) // Fetch categories
+  const [products, { refetch }] = useQuery(getProducts, { skip: 0, take: 100 })
+  const [categories] = useQuery(getCategories, {})
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOption, setSortOption] = useState("default")
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [openEdit, setOpenEdit] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState(null)
-
-  const handleEdit = (product) => {
-    setSelectedProduct(product) // Set the selected product for editing
-    setOpenEdit(true)
-  }
-
-  const handleCloseEdit = () => {
-    setOpenEdit(false)
-    setSelectedProduct(null) // Clear the selected product after closing the modal
-  }
-
-  // const handleProductAdded = () => {
-  //   setOpenEdit(false)
-  //   setSelectedProduct(null)
-  //   Swal.fire({
-  //     title: "Success!",
-  //     text: "The product has been added or updated successfully.",
-  //     icon: "success",
-  //     confirmButtonText: "OK",
-  //   })
-  //   refetch() // Refetch the products list to include the update
-  // }
-
-  const filteredAndSortedProducts = products
-    .filter((product) => {
-      const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesCategory =
-        selectedCategory === "all" || product.category.id === parseInt(selectedCategory)
-      return matchesSearch && matchesCategory
-    })
-    .sort((a, b) => {
-      if (sortOption === "srpAsc") return a.srp - b.srp
-      return 0
-    })
-
-  const handleDelete = async (productId: number) => {
-    try {
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "This action cannot be undone!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "No, cancel!",
-      })
-
-      if (result.isConfirmed) {
-        await deleteProductMutation({ id: productId })
-        Swal.fire("Deleted!", "The product has been deleted.", "success")
-        await refetch()
-      }
-    } catch (error) {
-      Swal.fire("Error!", "An error occurred while deleting the product.", "error")
-    }
-  }
-
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, productId: string) => {
     setAnchorEl(event.currentTarget)
+    setOpenMenuId(productId)
   }
 
   const handleMenuClose = () => {
     setAnchorEl(null)
+    setOpenMenuId(null)
   }
 
-  const [open, setOpen] = useState(false)
-
-  const handleOpen = () => {
-    setOpen(true)
-    console.log("open")
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
-  const handleProductAdded = () => {
-    setOpen(false) // Close the modal
-    Swal.fire({
-      title: "Success!",
-      text: "The product has been added successfully.",
-      icon: "success",
-      confirmButtonText: "OK",
+  const handleDelete = async (productId: string) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
     })
+    if (result.isConfirmed) {
+      try {
+        await deleteProductMutation({ id: productId })
+        Swal.fire("Deleted!", "The product has been deleted.", "success")
+        await refetch()
+      } catch {
+        Swal.fire("Error!", "An error occurred while deleting the product.", "error")
+      }
+    }
   }
+
+  const filteredProducts = products
+    .filter((product) => {
+      const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesCategory =
+        selectedCategory === "all" || product.category.id === selectedCategory
+      return matchesSearch && matchesCategory
+    })
+    .sort((a, b) => {
+      if (sortOption === "srpAsc") return a.srp - b.srp
+      if (sortOption === "srpDesc") return b.srp - a.srp
+      if (sortOption === "nameAsc") return a.productName.localeCompare(b.productName)
+      return 0
+    })
 
   return (
     <div>
-      <div className="bg-orange-200 p-4 rounded-t-lg flex flex-row items-center justify-between w-full">
-        <h1 className="text-4xl font-bold text-white">Products</h1>
-        <button
-          className="bg-green-500 px-4 py-2 text-2xl text-white font-bold rounded-md hover:bg-green-600 transition-colors duration-300"
-          onClick={handleOpen}
-        >
-          + Add Product
-        </button>
-      </div>
-      <div className="flex flex-row gap-4 mt-8">
-        {/* Search Field */}
-        <TextField
-          label="Search Products"
-          variant="outlined"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          fullWidth
-          sx={{ marginBottom: 2 }}
-        />
-
-        {/* Sort Dropdown */}
-        <TextField
-          select
-          label="Sort by"
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
-          sx={{ marginBottom: 2 }}
-          fullWidth
-        >
-          <MenuItem value="default">Default</MenuItem>
-          <MenuItem value="srpAsc">Price: Low to High</MenuItem>
-        </TextField>
-
-        {/* Category Filter */}
-        <TextField
-          select
-          label="Filter by Category"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          sx={{ marginBottom: 4 }}
-          fullWidth
-        >
-          <MenuItem value="all">All Categories</MenuItem>
-          {categories.map((category) => (
-            <MenuItem key={category.id} value={category.id.toString()}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </TextField>
-      </div>
-
-      <div className="flex flex-row mt-8 gap-4 flex-wrap justify-evenly">
-        {filteredAndSortedProducts.map((product) => (
-          <Card
-            key={product.id}
-            sx={{
-              width: 250,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "justify-between",
-            }}
+      <div className="bg-orange-500 p-5 rounded-t-xl flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-white">Products</h1>
+        {categories.length === 0 ? (
+          <button
+            className="bg-white text-orange-500 font-bold px-5 py-2 rounded-lg opacity-50 cursor-not-allowed"
+            onClick={() =>
+              Swal.fire(
+                "No categories",
+                "You need to create a category before adding a product.",
+                "warning"
+              )
+            }
           >
-            <CardHeader
-              title={product.productName}
-              subheader={product.category.name}
-              action={
-                <>
-                  <IconButton aria-label="settings" onClick={handleMenuOpen}>
-                    <MoreVertIcon />
-                  </IconButton>
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                    transformOrigin={{ vertical: "top", horizontal: "right" }}
-                  >
-                    <MenuItem
-                      onClick={() => {
-                        handleEdit(product)
-                        handleMenuClose()
-                      }}
-                    >
-                      <EditIcon fontSize="small" style={{ marginRight: 8 }} /> Edit
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        handleDelete(product.id)
-                        handleMenuClose()
-                      }}
-                    >
-                      <DeleteIcon fontSize="small" style={{ marginRight: 8 }} /> Delete
-                    </MenuItem>
-                  </Menu>
-                </>
-              }
-            />
-            <CardMedia
-              component="img"
-              sx={style}
-              image={product.productImage || ""}
-              alt={product.productName}
-            />
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                {product.productDescription}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Quantity: {product.quantity}
-              </Typography>
-              <Typography color="text.secondary">SRP: {product.srp}</Typography>
-              <Typography color="text.secondary">SDP: {product.sdp}</Typography>
-            </CardContent>
-          </Card>
-        ))}
+            + Add Product
+          </button>
+        ) : (
+          <Link
+            href="/admin/products/new"
+            className="bg-white text-orange-500 font-bold px-5 py-2 rounded-lg hover:bg-orange-50 transition-colors"
+          >
+            + Add Product
+          </Link>
+        )}
       </div>
 
-      <Modal
-        open={openEdit}
-        onClose={handleCloseEdit}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={styleNew}>
-          <ProductForm product={selectedProduct} onProductAdded={handleProductAdded} />
-        </Box>
-      </Modal>
+      {categories.length === 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-4 py-3 rounded-xl mb-4">
+          No categories yet. Create a category first — products must belong to a category.
+        </div>
+      )}
 
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={styleNew}>
-          <div className="p-2 z-10">
-            <ProductForm onProductAdded={handleProductAdded} />
-          </div>
-        </Box>
-      </Modal>
+      <div className="bg-gray-50 p-4 border border-gray-200 rounded-b-xl mb-6">
+        <div className="flex flex-row gap-3 flex-wrap">
+          <TextField
+            label="Search Products"
+            variant="outlined"
+            size="small"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ flex: 2, minWidth: 180 }}
+          />
+          <TextField
+            select
+            label="Sort by"
+            value={sortOption}
+            size="small"
+            onChange={(e) => setSortOption(e.target.value)}
+            sx={{ flex: 1, minWidth: 150 }}
+          >
+            <MenuItem value="default">Default</MenuItem>
+            <MenuItem value="nameAsc">Name A–Z</MenuItem>
+            <MenuItem value="srpAsc">Price: Low to High</MenuItem>
+            <MenuItem value="srpDesc">Price: High to Low</MenuItem>
+          </TextField>
+          <TextField
+            select
+            label="Category"
+            value={selectedCategory}
+            size="small"
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            sx={{ flex: 1, minWidth: 150 }}
+          >
+            <MenuItem value="all">All Categories</MenuItem>
+            {categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>
+                {cat.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </div>
+        <p className="text-sm text-gray-500 mt-2">{filteredProducts.length} product(s) found</p>
+      </div>
+
+      {filteredProducts.length === 0 ? (
+        <div className="text-center py-16 text-gray-400">
+          <p className="text-xl">No products found.</p>
+          <p className="text-sm mt-1">Try adjusting your search or filters.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filteredProducts.map((product) => (
+            <Card
+              key={product.id}
+              sx={{ display: "flex", flexDirection: "column", borderRadius: "12px" }}
+              elevation={2}
+            >
+              <CardHeader
+                title={
+                  <Typography variant="subtitle1" fontWeight="bold" noWrap>
+                    {product.productName}
+                  </Typography>
+                }
+                subheader={
+                  <Chip label={product.category.name} size="small" sx={{ mt: 0.5 }} />
+                }
+                action={
+                  <>
+                    <IconButton size="small" onClick={(e) => handleMenuOpen(e, product.id)}>
+                      <MoreVertIcon />
+                    </IconButton>
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={openMenuId === product.id}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem
+                        component={Link}
+                        href={`/admin/products/${product.id}/edit`}
+                        onClick={handleMenuClose}
+                      >
+                        <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          handleDelete(product.id)
+                          handleMenuClose()
+                        }}
+                        sx={{ color: "error.main" }}
+                      >
+                        <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Delete
+                      </MenuItem>
+                    </Menu>
+                  </>
+                }
+                sx={{ pb: 0 }}
+              />
+              <CardMedia
+                component="img"
+                sx={{ height: 120, objectFit: "contain", p: 1 }}
+                image={product.productImage || "/izeek.png"}
+                alt={product.productName}
+              />
+              <CardContent sx={{ pt: 1 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }} noWrap>
+                  {product.productDescription}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" display="block">
+                  Qty: {product.quantity}
+                </Typography>
+                <Typography variant="body2" fontWeight="bold" color="warning.main">
+                  SRP: ₱{product.srp.toLocaleString()}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  SDP: ₱{product.sdp.toLocaleString()}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
     </div>
   )
 }

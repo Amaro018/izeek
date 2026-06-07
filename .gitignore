@@ -27,7 +27,13 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # local env files
+.env
 .env*.local
+
+# local database files (project uses MariaDB now)
+*.sqlite
+*.sqlite-journal
+*.db
 
 # vercel
 .vercel

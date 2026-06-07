@@ -1,11 +1,18 @@
 "use client"
 import { useState } from "react"
 import { BlitzPage } from "blitz"
+import { useQuery } from "@blitzjs/rpc"
+import getSiteSettings from "../queries/getSiteSettings"
+import PhoneIcon from "@mui/icons-material/Phone"
+import EmailIcon from "@mui/icons-material/Email"
+import LocationOnIcon from "@mui/icons-material/LocationOn"
+import FacebookIcon from "@mui/icons-material/Facebook"
 
 const ContactPage: BlitzPage = () => {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
+  const [site] = useQuery(getSiteSettings, null, { suspense: false })
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -20,71 +27,110 @@ const ContactPage: BlitzPage = () => {
       const data = await response.json()
       if (data.success) {
         alert("Message sent successfully")
+        setName("")
+        setEmail("")
+        setMessage("")
       } else {
-        alert("Error sending message")
+        alert(data.error || "Error sending message")
       }
     } catch (error) {
       console.error(error)
+      alert("Error sending message")
     }
   }
 
   return (
-    <div className="flex flex-col items-center p-4">
-      <h1 className="text-4xl font-bold my-4">Contact Us</h1>
-      <form className="w-full max-w-md">
-        <div className="flex flex-wrap -mx-3 mb-6">
-          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="name"
-            >
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-gradient-to-r from-orange-500 to-orange-400 py-12 px-8 text-center text-white">
+        <h1 className="text-4xl font-extrabold">Contact Us</h1>
+        <p className="mt-2 text-orange-100">We&apos;d love to hear from you.</p>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-8 py-12 grid grid-cols-1 lg:grid-cols-2 gap-10">
+        {/* Contact info */}
+        <div className="flex flex-col gap-5">
+          <h2 className="text-2xl font-bold text-gray-800">Get In Touch</h2>
+          {site?.phone && (
+            <div className="flex items-center gap-3 text-gray-600">
+              <PhoneIcon className="text-orange-500" />
+              <span>{site.phone}</span>
+            </div>
+          )}
+          {site?.email && (
+            <div className="flex items-center gap-3 text-gray-600">
+              <EmailIcon className="text-orange-500" />
+              <span>{site.email}</span>
+            </div>
+          )}
+          {site?.address && (
+            <div className="flex items-center gap-3 text-gray-600">
+              <LocationOnIcon className="text-orange-500" />
+              <span>{site.address}</span>
+            </div>
+          )}
+          {site?.facebook && (
+            <div className="flex items-center gap-3">
+              <FacebookIcon className="text-orange-500" />
+              <a
+                href={site.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                Message us on Facebook
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Message form */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col gap-4"
+        >
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-700" htmlFor="name">
               Name
             </label>
             <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
+              className="px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm"
               id="name"
               type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
-          <div className="w-full md:w-1/2 px-3">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="email"
-            >
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-700" htmlFor="email">
               Email
             </label>
             <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
+              className="px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm"
               id="email"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-        </div>
-        <div className="flex flex-wrap -mx-3 mb-6">
-          <div className="w-full px-3">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="message"
-            >
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-700" htmlFor="message">
               Message
             </label>
             <textarea
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
+              className="px-4 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm min-h-[120px]"
               id="message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
             />
           </div>
-        </div>
-        <div className="md:flex md:items-center">
-          <div className="md:w-1/3">
-            <button
-              type="submit"
-              className="shadow bg-teal-400 hover:bg-teal-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      </form>
+          <button
+            type="submit"
+            className="self-start bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-2.5 rounded-lg transition-colors"
+          >
+            Send Message
+          </button>
+        </form>
+      </div>
     </div>
   )
 }
