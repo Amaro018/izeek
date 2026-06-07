@@ -1,10 +1,12 @@
 # Stage 1: Install dependencies
 FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
+# python3/make/g++ are needed to build native deps (sodium-native via secure-password)
+RUN apk add --no-cache libc6-compat python3 make g++
 WORKDIR /app
 ENV HUSKY=0
 COPY package*.json ./
-RUN npm install
+# legacy-peer-deps matches the project's .npmrc (Blitz has peer-dep conflicts otherwise)
+RUN npm install --legacy-peer-deps
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
@@ -23,6 +25,9 @@ RUN npm run build
 # Stage 3: Runner
 FROM node:20-alpine AS runner
 WORKDIR /app
+
+# Prisma's query engine needs libssl (openssl 3) + libc6-compat at runtime
+RUN apk add --no-cache openssl libc6-compat
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
