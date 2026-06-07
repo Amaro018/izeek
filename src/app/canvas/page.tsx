@@ -2,7 +2,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useQuery } from "@blitzjs/rpc"
-import getSiteSettings from "../queries/getSiteSettings"
+import getSiteSettings, { SITE_DEFAULTS } from "../queries/getSiteSettings"
 import { useCart } from "../components/CartContext"
 import Swal from "sweetalert2"
 import DeleteIcon from "@mui/icons-material/Delete"
@@ -11,7 +11,13 @@ import autoTable from "jspdf-autotable"
 
 export default function CanvasPage() {
   const { items, total, count, setQuantity, removeItem, clear } = useCart()
-  const [site] = useQuery(getSiteSettings, null, { suspense: false })
+  const [site] = useQuery(getSiteSettings, null, {
+    suspense: false,
+    initialData: SITE_DEFAULTS,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  })
 
   const buildMessage = () => {
     const lines = items.map(

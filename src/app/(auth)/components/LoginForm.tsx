@@ -4,7 +4,7 @@ import Link from "next/link"
 import login from "../mutations/login"
 import { Login } from "../validations"
 import { useMutation, useQuery } from "@blitzjs/rpc"
-import getSiteSettings from "../../queries/getSiteSettings"
+import getSiteSettings, { SITE_DEFAULTS } from "../../queries/getSiteSettings"
 import { useSearchParams, useRouter } from "next/navigation"
 import type { Route } from "next"
 import { useState } from "react"
@@ -21,7 +21,13 @@ export const LoginForm = (props: LoginFormProps) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
-  const [site] = useQuery(getSiteSettings, null, { suspense: false })
+  const [site] = useQuery(getSiteSettings, null, {
+    suspense: false,
+    initialData: SITE_DEFAULTS,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
