@@ -10,6 +10,8 @@ RUN npm install --legacy-peer-deps
 
 # Stage 2: Build the application
 FROM node:20-alpine AS builder
+# openssl + libc6-compat: Prisma query AND schema engines (db push) need libssl
+RUN apk add --no-cache openssl libc6-compat
 WORKDIR /app
 ENV HUSKY=0
 COPY --from=deps /app/node_modules ./node_modules
