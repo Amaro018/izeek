@@ -15,6 +15,10 @@ export const metadata = {
   description: "i-Zeek Data Solution and Network Services",
 }
 
+// Layout reads site settings from the DB at request time — never prerender it
+// statically (avoids DB connection attempts during the Docker build).
+export const dynamic = "force-dynamic"
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Fetch contact/site settings once on the server so every consumer (footer,
   // contact, login, cart) gets the value at SSR — no client refetch, no flicker.
