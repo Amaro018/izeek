@@ -6,8 +6,7 @@ import Footer from "./components/Footer"
 import { CartProvider } from "./components/CartContext"
 import { SiteSettingsProvider } from "./components/SiteSettingsContext"
 import ThemeRegistry from "./ThemeRegistry"
-import { invoke } from "./blitz-server"
-import getSiteSettings from "./queries/getSiteSettings"
+import { loadSiteSettings } from "./lib/loadSiteSettings"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -19,7 +18,7 @@ export const metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Fetch contact/site settings once on the server so every consumer (footer,
   // contact, login, cart) gets the value at SSR — no client refetch, no flicker.
-  const site = await invoke(getSiteSettings, null)
+  const site = await loadSiteSettings()
 
   return (
     <html lang="en">
