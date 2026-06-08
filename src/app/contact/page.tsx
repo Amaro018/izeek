@@ -1,8 +1,7 @@
 "use client"
 import { useState } from "react"
 import { BlitzPage } from "blitz"
-import { useQuery } from "@blitzjs/rpc"
-import getSiteSettings, { SITE_DEFAULTS } from "../queries/getSiteSettings"
+import { useSiteSettings } from "../components/SiteSettingsContext"
 import PhoneIcon from "@mui/icons-material/Phone"
 import EmailIcon from "@mui/icons-material/Email"
 import LocationOnIcon from "@mui/icons-material/LocationOn"
@@ -12,13 +11,7 @@ const ContactPage: BlitzPage = () => {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
-  const [site] = useQuery(getSiteSettings, null, {
-    suspense: false,
-    initialData: SITE_DEFAULTS,
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    retry: false,
-  })
+  const site = useSiteSettings()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

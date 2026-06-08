@@ -1,22 +1,12 @@
 "use client"
-import { useQuery } from "@blitzjs/rpc"
-import getSiteSettings, { SITE_DEFAULTS } from "../queries/getSiteSettings"
+import { useSiteSettings } from "./SiteSettingsContext"
 import PhoneIcon from "@mui/icons-material/Phone"
 import EmailIcon from "@mui/icons-material/Email"
 import LocationOnIcon from "@mui/icons-material/LocationOn"
 import FacebookIcon from "@mui/icons-material/Facebook"
 
 export default function Footer() {
-  // initialData guarantees `site` is never undefined, so the contact fields
-  // never blank out / flicker, even during a background refetch or remount.
-  const [site] = useQuery(getSiteSettings, null, {
-    suspense: false,
-    initialData: SITE_DEFAULTS,
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    retry: false,
-  })
+  const site = useSiteSettings()
 
   return (
     <footer className="w-full border-t bg-white print:hidden">
