@@ -1,9 +1,10 @@
 import db from "./index"
+import { PasswordHash } from "../src/app/lib/password"
 
 const seed = async () => {
-  // hashed password = password123
-  const hashedPassword =
-    "JGFyZ29uMmlkJHY9MTkkbT02NTUzNix0PTIscD0xJCtCUmJlbXpWTnhRTCtnVUxwZThHNnckaHkySU15OGlVOHp4WEl4VXphbjZRR2JLSUhVNDI1eTQ3azc1WEhxSDE4SQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+  // scrypt hash of "password123" (regenerated each seed run so it stays in sync
+  // with the PasswordHash scheme; replaces the old sodium/argon2 hash).
+  const hashedPassword = await PasswordHash.hash("password123")
 
   const existingUser = await db.user.findFirst({
     where: {
@@ -19,6 +20,13 @@ const seed = async () => {
         role: "ADMIN",
         hashedPassword,
       },
+    })
+  } else {
+    // Reset the seeded admin's password to the scrypt hash so the old
+    // argon2 hash (unverifiable without sodium-native) is replaced.
+    await db.user.update({
+      where: { id: existingUser.id },
+      data: { hashedPassword },
     })
   }
 

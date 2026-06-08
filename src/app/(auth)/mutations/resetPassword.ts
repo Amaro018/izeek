@@ -1,5 +1,5 @@
 import { hash256 } from "@blitzjs/auth"
-import { SecurePassword } from "@blitzjs/auth/secure-password"
+import { PasswordHash } from "../../lib/password"
 import { resolver } from "@blitzjs/rpc"
 import db from "db"
 import { ResetPassword } from "../validations"
@@ -34,7 +34,7 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
   }
 
   // 5. Since token is valid, now we can update the user's password
-  const hashedPassword = await SecurePassword.hash(password.trim())
+  const hashedPassword = await PasswordHash.hash(password.trim())
   const user = await db.user.update({
     where: { id: savedToken.userId },
     data: { hashedPassword },
