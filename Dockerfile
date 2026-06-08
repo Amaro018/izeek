@@ -40,9 +40,13 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# Prisma schema + generated client (needed at runtime by the standalone server)
 COPY --from=builder --chown=nextjs:nodejs /app/db ./db
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+# Overlay the full node_modules AFTER the standalone copy. Next's standalone
+# tracer drops native .node binaries — notably sodium-native (used by
+# @blitzjs/auth's SecurePassword) — which segfaults the process on login.
+# Copying the real, musl-compiled node_modules (incl. .prisma + sodium-native)
+# fixes the crash.
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Writable uploads dir for product images
 RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
