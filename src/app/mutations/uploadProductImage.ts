@@ -56,7 +56,8 @@ export default resolver.pipe(
 
     await fs.promises.writeFile(filePath, buffer)
 
-    const fileUrl = `${process.env.BASE_URL || "http://localhost:3000"}/uploads/${safeName}`
-    return fileUrl
+    // Return a relative path (not an absolute URL). The browser resolves it
+    // against the current origin, so it works on any domain — no BASE_URL.
+    return `/uploads/${safeName}`
   }
 )
