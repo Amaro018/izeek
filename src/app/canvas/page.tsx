@@ -117,12 +117,12 @@ export default function CanvasPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-orange-500 to-orange-400 py-10 px-8 text-center text-white print:hidden">
-        <h1 className="text-4xl font-extrabold">My Cart</h1>
+      <div className="bg-gradient-to-r from-orange-500 to-orange-400 py-8 sm:py-10 px-4 sm:px-8 text-center text-white print:hidden">
+        <h1 className="text-3xl sm:text-4xl font-extrabold">My Cart</h1>
         <p className="mt-2 text-orange-100">Estimate the total for the products you want.</p>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         {/* Print-only branded letterhead */}
         <div className="hidden print:block mb-6">
           <div className="flex items-start justify-between border-b-2 border-orange-500 pb-4">
@@ -155,15 +155,15 @@ export default function CanvasPage() {
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0"
+              className="flex flex-wrap items-center gap-3 sm:gap-4 p-4 border-b border-gray-100 last:border-b-0"
             >
               <img
                 src={item.productImage || "/izeek.png"}
                 alt={item.productName}
-                className="w-16 h-16 object-contain rounded-lg border border-gray-100 shrink-0"
+                className="w-14 h-14 sm:w-16 sm:h-16 object-contain rounded-lg border border-gray-100 shrink-0"
               />
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-800 truncate">{item.productName}</p>
+              <div className="flex-1 min-w-[45%]">
+                <p className="font-semibold text-gray-800">{item.productName}</p>
                 <p className="text-sm text-orange-500 font-bold">
                   ₱{item.srp.toLocaleString()}
                 </p>
@@ -191,13 +191,13 @@ export default function CanvasPage() {
                 </button>
               </div>
 
-              <div className="w-28 text-right font-bold text-gray-800">
+              <div className="w-24 sm:w-28 text-right font-bold text-gray-800 ml-auto sm:ml-0">
                 ₱{(item.srp * item.quantity).toLocaleString()}
               </div>
 
               <button
                 onClick={() => removeItem(item.id)}
-                className="text-gray-400 hover:text-red-500 transition-colors"
+                className="text-gray-400 hover:text-red-500 transition-colors shrink-0"
                 title="Remove"
               >
                 <DeleteIcon />

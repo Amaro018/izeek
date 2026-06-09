@@ -40,12 +40,12 @@ const ContactPage: BlitzPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-orange-500 to-orange-400 py-12 px-8 text-center text-white">
-        <h1 className="text-4xl font-extrabold">Contact Us</h1>
+      <div className="bg-gradient-to-r from-orange-500 to-orange-400 py-10 sm:py-12 px-4 sm:px-8 text-center text-white">
+        <h1 className="text-3xl sm:text-4xl font-extrabold">Contact Us</h1>
         <p className="mt-2 text-orange-100">We&apos;d love to hear from you.</p>
       </div>
 
-      <div className="max-w-5xl mx-auto px-8 py-12 grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10 sm:py-12 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
         {/* Contact info */}
         <div className="flex flex-col gap-5">
           <h2 className="text-2xl font-bold text-gray-800">Get In Touch</h2>

@@ -23,20 +23,21 @@ export default function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <div className="flex flex-col w-56 bg-white border border-gray-200 rounded-2xl shadow-sm h-fit sticky top-6">
-      <div className="flex items-center gap-2 px-4 py-4 border-b border-gray-100">
+    <div className="flex flex-col bg-white border border-gray-200 rounded-2xl shadow-sm lg:w-56 lg:h-fit lg:sticky lg:top-6">
+      <div className="hidden lg:flex items-center gap-2 px-4 py-4 border-b border-gray-100">
         <StoreIcon className="text-orange-500" />
         <span className="font-bold text-gray-700 text-sm">Admin Panel</span>
       </div>
 
-      <div className="flex flex-col gap-1 p-3">
+      {/* Horizontal scroll on mobile, vertical stack on desktop */}
+      <div className="flex lg:flex-col gap-1 p-2 lg:p-3 overflow-x-auto">
         {navItems.map(({ href, label, icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + "/")
           return (
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all ${
+              className={`flex items-center gap-2 lg:gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all whitespace-nowrap shrink-0 ${
                 isActive
                   ? "bg-orange-500 text-white shadow-sm"
                   : "text-gray-600 hover:bg-orange-50 hover:text-orange-600"
@@ -49,7 +50,7 @@ export default function Sidebar() {
         })}
       </div>
 
-      <div className="mt-auto p-3 border-t border-gray-100">
+      <div className="hidden lg:block mt-auto p-3 border-t border-gray-100">
         <LogoutButton />
       </div>
     </div>

@@ -39,8 +39,8 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-orange-500 to-orange-400 py-12 px-8 text-center text-white">
-        <h1 className="text-4xl font-extrabold">Our Products</h1>
+      <div className="bg-gradient-to-r from-orange-500 to-orange-400 py-10 sm:py-12 px-4 sm:px-8 text-center text-white">
+        <h1 className="text-3xl sm:text-4xl font-extrabold">Our Products</h1>
         <p className="mt-2 text-orange-100">Browse our complete catalog</p>
         <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center items-center max-w-2xl mx-auto">
           <input
@@ -65,7 +65,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="py-10 px-8 max-w-7xl mx-auto">
+      <div className="py-8 sm:py-10 px-4 sm:px-8 max-w-7xl mx-auto">
         {products.length === 0 ? (
           <p className="text-center text-gray-400 text-lg py-16">No products found.</p>
         ) : (

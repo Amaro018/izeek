@@ -56,17 +56,17 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-orange-50 to-orange-100 px-8 py-20 text-center">
-        <h1 className="text-5xl font-extrabold text-gray-800 leading-tight">
+      <section className="bg-gradient-to-br from-orange-50 to-orange-100 px-4 sm:px-8 py-14 sm:py-20 text-center">
+        <h1 className="text-3xl sm:text-5xl font-extrabold text-gray-800 leading-tight">
           i-Zeek Data Solution
           <br />
           <span className="text-orange-500">& Network Services</span>
         </h1>
-        <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="mt-5 sm:mt-6 text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
           Quality, reliability, and expertise — delivering comprehensive solutions for CCTV,
           software, hardware, construction, automation, and supplies.
         </p>
-        <div className="flex justify-center gap-4 mt-8">
+        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-8 max-w-xs sm:max-w-none mx-auto">
           <Link
             href="/products"
             className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-3 rounded-xl transition-colors shadow"
@@ -83,8 +83,8 @@ export default function Home() {
       </section>
 
       {/* Services */}
-      <section className="py-16 px-8 bg-white">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">Our Services</h2>
+      <section className="py-12 sm:py-16 px-4 sm:px-8 bg-white">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-2">Our Services</h2>
         <p className="text-center text-gray-500 mb-10">Everything you need, under one roof.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
           {services.map((s) => (
@@ -102,8 +102,8 @@ export default function Home() {
 
       {/* Featured Products */}
       {(products?.length ?? 0) > 0 && (
-        <section className="py-16 px-8 bg-gray-50">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">Featured Products</h2>
+        <section className="py-12 sm:py-16 px-4 sm:px-8 bg-gray-50">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-2">Featured Products</h2>
           <p className="text-center text-gray-500 mb-10">Browse our latest offerings.</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {products.map((product) => (

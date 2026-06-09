@@ -24,7 +24,7 @@ export default function AdminDashboard() {
         <p className="text-gray-500 mt-1">Overview of your store</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-10">
         <div className="bg-white border border-orange-200 rounded-2xl p-6 shadow-sm flex items-center gap-6">
           <div className="bg-orange-100 p-4 rounded-full">
             <InventoryIcon className="text-orange-500" style={{ fontSize: 40 }} />
